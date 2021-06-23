@@ -1,3 +1,4 @@
+import 'package:cris_attendance/constants/colors.dart';
 import 'package:cris_attendance/widgets/background.dart';
 import 'package:cris_attendance/widgets/card.dart';
 import 'package:flutter/material.dart';
