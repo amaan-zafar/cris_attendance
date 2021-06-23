@@ -1,3 +1,4 @@
+import 'package:cris_attendance/styles/colors.dart';
 import 'package:flutter/material.dart';
 
 class BackgroundWidget extends StatelessWidget {
@@ -14,8 +15,8 @@ class BackgroundWidget extends StatelessWidget {
           Container(
             height: height / 4,
             decoration: BoxDecoration(
-                color: Colors.blue,
-                // gradient: Styles.bgLinearGradient,
+                // color: Colors.blue,
+                gradient: AppColors.bgLinearGradient,
                 borderRadius:
                     BorderRadius.vertical(bottom: Radius.circular(16))),
           ),
