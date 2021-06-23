@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 class CardWidget extends StatelessWidget {
   final List<Widget> children;
   final double width;
+  final double? height;
 
-  const CardWidget({Key? key, required this.children, required this.width})
+  const CardWidget(
+      {Key? key, required this.children, required this.width, this.height})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
       width: width,
+      height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
         boxShadow: [

@@ -8,6 +8,7 @@ class BackgroundWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
 
     return SingleChildScrollView(
       child: Stack(
@@ -21,7 +22,8 @@ class BackgroundWidget extends StatelessWidget {
                     BorderRadius.vertical(bottom: Radius.circular(16))),
           ),
           Container(
-            margin: const EdgeInsets.fromLTRB(16, 48, 16, 0),
+            margin:
+                EdgeInsets.fromLTRB(width * 0.05, height / 16, width * 0.05, 0),
             child: child,
           ),
         ],

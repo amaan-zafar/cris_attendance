@@ -3,6 +3,10 @@
    <application
         android:label="cris_attendance"
         android:icon="@mipmap/ic_launcher">
+
+        <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyBA7gvQ0R34BdmGzQgnwD7LsRR51P-Qxgg"/>
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
