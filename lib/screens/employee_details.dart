@@ -1,12 +1,43 @@
+import 'package:cris_attendance/models/attendance.dart';
 import 'package:cris_attendance/screens/map_screen.dart';
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/background.dart';
 import 'package:cris_attendance/widgets/card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:geolocator/geolocator.dart';
 
-class EmployeeDetailsScreen extends StatelessWidget {
+class EmployeeDetailsScreen extends StatefulWidget {
   const EmployeeDetailsScreen({Key? key}) : super(key: key);
+
+  @override
+  _EmployeeDetailsScreenState createState() => _EmployeeDetailsScreenState();
+}
+
+class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
+  late List<AttendanceSlot> slots;
+
+  @override
+  void initState() {
+    slots = [
+      AttendanceSlot(
+          slotNumber: 0,
+          status: AttendanceStatus.NotMarked,
+          startTime: TimeOfDay(hour: 9, minute: 0),
+          endTime: TimeOfDay(hour: 9, minute: 30)),
+      AttendanceSlot(
+          slotNumber: 1,
+          status: AttendanceStatus.NotMarked,
+          startTime: TimeOfDay(hour: 12, minute: 0),
+          endTime: TimeOfDay(hour: 12, minute: 30)),
+      AttendanceSlot(
+          slotNumber: 2,
+          status: AttendanceStatus.NotMarked,
+          startTime: TimeOfDay(hour: 15, minute: 0),
+          endTime: TimeOfDay(hour: 15, minute: 30)),
+    ];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,15 +96,39 @@ class EmployeeDetailsScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (_) => MapScreen()));
+        onPressed: () async {
+          Position? position = await _getCurrentLocation();
+          DateTime now = DateTime.now();
+          print('now time is $now');
+          position != null
+              ? Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => MapScreen(
+                            currentPosition: position,
+                          )))
+              : print('Null current positon');
         },
         label: Text('Mark Attendance'),
-        icon: Icon(FeatherIcons.userCheck),
+        icon: Icon(MaterialCommunityIcons.page_next),
         backgroundColor: AppColors.green,
         foregroundColor: AppColors.textColor,
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  Future<Position?> _getCurrentLocation() async {
+    Position position;
+    try {
+      position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best,
+          timeLimit: Duration(seconds: 10));
+      print('Current position is $position');
+      return position;
+    } catch (e) {
+      print('Error in getting current position : ${e.toString()}');
+    }
+    return null;
   }
 }

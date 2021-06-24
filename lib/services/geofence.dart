@@ -14,13 +14,11 @@ class Geofence {
       {required String pointedLatitude,
       required String pointedLongitude,
       required String radiusMeter,
-      required int eventPeriodInSeconds}) async {
+      required Position position}) async {
     double latitude = _parser(pointedLatitude);
     double longitude = _parser(pointedLongitude);
     double radiusInMeter = _parser(radiusMeter);
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best,
-        timeLimit: Duration(seconds: eventPeriodInSeconds));
+
     double distanceInMeters = Geolocator.distanceBetween(
         latitude, longitude, position.latitude, position.longitude);
     print('dist is $distanceInMeters');
