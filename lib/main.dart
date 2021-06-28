@@ -17,14 +17,10 @@ void main() async {
       ReminderService(flutterLocalNotificationsPlugin);
   await _reminderService.initialise();
   await _reminderService.scheduledNotif();
-  runApp(MyApp(_reminderService));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final ReminderService _reminderService;
-  MyApp(this._reminderService);
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
