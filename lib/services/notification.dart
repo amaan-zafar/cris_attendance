@@ -57,12 +57,12 @@ class ReminderService {
   }
 
   Future scheduledNotif() async {
-    print('Scheduling notif');
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     await _flutterLocalNotificationsPlugin.zonedSchedule(
         0,
-        'Mark Attendance',
-        'Mark your attendance for Time Slot 1 at This Office',
-        _nextInstanceOfDateTime(),
+        'Mark your Attendance',
+        "It's ${now.hour}:${now.minute}. Mark your attendance now",
+        _nextInstanceOfDateTime(now),
         const NotificationDetails(
             android: AndroidNotificationDetails(
                 'Attendance Notification Channel Id',
@@ -74,13 +74,12 @@ class ReminderService {
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime);
   }
 
-  tz.TZDateTime _nextInstanceOfDateTime() {
-    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+  tz.TZDateTime _nextInstanceOfDateTime(tz.TZDateTime now) {
     int hour;
     int min;
-    if (now.isBefore(DateTime(now.year, now.month, now.day, 2, 20))) {
-      hour = 2;
-      min = 20;
+    if (now.isBefore(DateTime(now.year, now.month, now.day, 9, 0))) {
+      hour = 9;
+      min = 0;
     } else if (now.isBefore(DateTime(now.year, now.month, now.day, 12))) {
       hour = 12;
       min = 0;
