@@ -12,7 +12,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 void main() async {
   // needed if you intend to initialize in the `main` function
   WidgetsFlutterBinding.ensureInitialized();
-  // Bloc.observer = SimpleBlocObserver();
+  Bloc.observer = SimpleBlocObserver();
   ReminderService _reminderService =
       ReminderService(flutterLocalNotificationsPlugin);
   await _reminderService.initialise();
