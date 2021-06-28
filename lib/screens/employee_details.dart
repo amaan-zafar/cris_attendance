@@ -15,30 +15,6 @@ class EmployeeDetailsScreen extends StatefulWidget {
 }
 
 class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
-  late List<AttendanceSlot> slots;
-
-  @override
-  void initState() {
-    slots = [
-      AttendanceSlot(
-          slotNumber: 0,
-          status: AttendanceStatus.NotMarked,
-          startTime: TimeOfDay(hour: 9, minute: 0),
-          endTime: TimeOfDay(hour: 9, minute: 30)),
-      AttendanceSlot(
-          slotNumber: 1,
-          status: AttendanceStatus.NotMarked,
-          startTime: TimeOfDay(hour: 12, minute: 0),
-          endTime: TimeOfDay(hour: 12, minute: 30)),
-      AttendanceSlot(
-          slotNumber: 2,
-          status: AttendanceStatus.NotMarked,
-          startTime: TimeOfDay(hour: 15, minute: 0),
-          endTime: TimeOfDay(hour: 15, minute: 30)),
-    ];
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     final _textTheme = Theme.of(context).textTheme;
@@ -98,8 +74,6 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           Position? position = await _getCurrentLocation();
-          DateTime now = DateTime.now();
-          print('now time is $now');
           position != null
               ? Navigator.push(
                   context,

@@ -33,6 +33,8 @@ class _MapScreenState extends State<MapScreen> {
 
   Set<Circle> _circles = {};
 
+  bool _isTimeSlot = false;
+
   @override
   void initState() {
     _offices = [
@@ -52,6 +54,23 @@ class _MapScreenState extends State<MapScreen> {
           lng: "85.09496933762402",
           radInMtrs: "150"),
     ];
+    slots = [
+      AttendanceSlot(
+          slotNumber: 0,
+          status: AttendanceStatus.NotMarked,
+          startTime: TimeOfDay(hour: 9, minute: 0),
+          endTime: TimeOfDay(hour: 9, minute: 30)),
+      AttendanceSlot(
+          slotNumber: 1,
+          status: AttendanceStatus.NotMarked,
+          startTime: TimeOfDay(hour: 12, minute: 0),
+          endTime: TimeOfDay(hour: 12, minute: 30)),
+      AttendanceSlot(
+          slotNumber: 2,
+          status: AttendanceStatus.NotMarked,
+          startTime: TimeOfDay(hour: 15, minute: 0),
+          endTime: TimeOfDay(hour: 15, minute: 30)),
+    ];
     _currentPosition = widget.currentPosition;
     getInsideOffices();
     super.initState();
@@ -70,6 +89,16 @@ class _MapScreenState extends State<MapScreen> {
         print('office is ${element.officeName}');
       }
     });
+  }
+
+  startTimeStream() {
+    Duration dur = Duration(seconds: 1);
+    Stream<void> stream = Stream<String>.periodic(dur, callback);
+  }
+
+  String callback(value) {
+    DateTime _now = DateTime.now();
+    return 'Current timestamp: ${_now.hour}:${_now.minute}:${_now.second}.${_now.millisecond}';
   }
 
   @override
@@ -114,15 +143,18 @@ class _MapScreenState extends State<MapScreen> {
               width: double.infinity)
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (_) => CameraScreen()));
-        },
-        label: Text('Mark Attendance'),
-        icon: Icon(Feather.user_check),
-        backgroundColor: AppColors.green,
-        foregroundColor: AppColors.textColor,
+      floatingActionButton: Visibility(
+        visible: _isTimeSlot,
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => CameraScreen()));
+          },
+          label: Text('Mark Attendance'),
+          icon: Icon(Feather.user_check),
+          backgroundColor: AppColors.green,
+          foregroundColor: AppColors.textColor,
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
