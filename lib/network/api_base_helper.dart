@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'dart:async';
 
 class ApiProvider {
-  static const String _baseUrl = 'https://deploy-cris-db.herokuapp.com/webapi';
+  static const String _baseUrl = 'https://deploy-cris-db.herokuapp.com/webapi/';
   final http.Client httpClient;
 
   ApiProvider({required this.httpClient});
