@@ -62,7 +62,7 @@ class _CameraScreenState extends State<CameraScreen> {
       );
     } else {
       return const Text(
-        'You have not yet clicked an image from _previewImage.',
+        'You have not yet clicked an image.',
         textAlign: TextAlign.center,
       );
     }

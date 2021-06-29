@@ -3,6 +3,7 @@ class OfficeGeofence {
   String lat;
   String lng;
   String radInMtrs;
+  double? distanceFromCurrentLocation;
 
   OfficeGeofence(
       {required this.officeName,

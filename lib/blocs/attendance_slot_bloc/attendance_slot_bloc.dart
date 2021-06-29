@@ -16,6 +16,14 @@ class AttendanceSlotBloc
   Stream<AttendanceSlotState> mapEventToState(
     AttendanceSlotEvent event,
   ) async* {
-    // TODO: implement mapEventToState
+    DateTime now = DateTime.now();
+    AttendanceSlot nextSlot = slots.firstWhere((element) {
+      DateTime startTime = DateTime(now.year, now.month, now.day,
+          element.startTime.hour, element.endTime.minute);
+      return now.isBefore(startTime);
+    });
+    if (event is GetSlots) {
+      yield AttendanceSlotLoaded(slot: nextSlot);
+    }
   }
 }

@@ -21,142 +21,197 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   Completer<GoogleMapController> _controller = Completer();
 
-  late List<OfficeGeofence> _offices;
+  List<OfficeGeofence> _offices = [
+    OfficeGeofence(
+        officeName: "Office 1",
+        lat: "25.58790",
+        lng: "85.09500",
+        radInMtrs: "80"),
+    OfficeGeofence(
+        officeName: "Office 2",
+        lat: "25.585381090862434",
+        lng: "85.09535758698132",
+        radInMtrs: "100"),
+    OfficeGeofence(
+        officeName: "Office 3",
+        lat: "25.582476691908993",
+        lng: "85.09496933762402",
+        radInMtrs: "100"),
+  ];
 
-  late List<AttendanceSlot> slots;
+  List<AttendanceSlot> slots = [
+    AttendanceSlot(
+        slotNumber: 1,
+        status: AttendanceStatus.NotMarked,
+        startTime: TimeOfDay(hour: 9, minute: 0),
+        endTime: TimeOfDay(hour: 9, minute: 30)),
+    AttendanceSlot(
+        slotNumber: 2,
+        status: AttendanceStatus.NotMarked,
+        startTime: TimeOfDay(hour: 12, minute: 0),
+        endTime: TimeOfDay(hour: 12, minute: 30)),
+    AttendanceSlot(
+        slotNumber: 3,
+        status: AttendanceStatus.NotMarked,
+        startTime: TimeOfDay(hour: 17, minute: 0),
+        endTime: TimeOfDay(hour: 18, minute: 0)),
+  ];
 
-  late Position _currentPosition;
-
-  List<Map<String, dynamic>> _insideGeofencesData = [];
-
-  OfficeGeofence? selectedOffice;
+  AttendanceSlot? currentSlot;
+  OfficeGeofence? targetOffice;
 
   Set<Marker> _markers = {};
 
   Set<Circle> _circles = {};
 
-  bool _isTimeSlot = false;
+  bool _isVisible = false;
+
+  bool _isLoading = true;
+
+  String attendanceInfo =
+      'You can only mark attendance from a CRIS Office.\n[All CRIS offices are shown with markers on the Google Map.]';
 
   @override
   void initState() {
-    _offices = [
-      OfficeGeofence(
-          officeName: "Office 1",
-          lat: "25.58790",
-          lng: "85.09500",
-          radInMtrs: "80"),
-      OfficeGeofence(
-          officeName: "Office 2",
-          lat: "25.585381090862434",
-          lng: "85.09535758698132",
-          radInMtrs: "100"),
-      OfficeGeofence(
-          officeName: "Office 3",
-          lat: "25.587476691908993",
-          lng: "85.09496933762402",
-          radInMtrs: "100"),
-    ];
-    slots = [
-      AttendanceSlot(
-          slotNumber: 1,
-          status: AttendanceStatus.NotMarked,
-          startTime: TimeOfDay(hour: 9, minute: 0),
-          endTime: TimeOfDay(hour: 9, minute: 30)),
-      AttendanceSlot(
-          slotNumber: 2,
-          status: AttendanceStatus.NotMarked,
-          startTime: TimeOfDay(hour: 12, minute: 0),
-          endTime: TimeOfDay(hour: 12, minute: 30)),
-      AttendanceSlot(
-          slotNumber: 3,
-          status: AttendanceStatus.NotMarked,
-          startTime: TimeOfDay(hour: 15, minute: 0),
-          endTime: TimeOfDay(hour: 15, minute: 30)),
-    ];
-    _currentPosition = widget.currentPosition;
-    getInsideOffices();
+    currentSlot = getCurrentSlot(slots);
+    getTargetOffice(_offices).then((value) {
+      targetOffice = value;
+      print('Office is $targetOffice and slot is $currentSlot');
+      _isVisible = currentSlot != null && targetOffice != null ? true : false;
+      print('bool is $_isVisible');
+      if (targetOffice != null && currentSlot != null) {
+        attendanceInfo =
+            'Mark your attendance at ${targetOffice!.officeName} for time slot [${currentSlot!.startTime.hour}:${currentSlot!.startTime.minute}-${currentSlot!.endTime.hour}:${currentSlot!.endTime.minute}]';
+      } else if (targetOffice != null) {
+        attendanceInfo = 'You cannot mark the attendance now.';
+      } else {
+        attendanceInfo =
+            'You can only mark attendance from a CRIS Office.\n[All CRIS offices are shown with markers on the Google Map.]';
+      }
+      print('still running');
+      setState(() {
+        _isLoading = false;
+      });
+    });
+
     super.initState();
   }
 
-  getInsideOffices() {
-    Map<String, dynamic> geofenceData;
-    _offices.forEach((element) async {
-      geofenceData = await Geofence.getGeofenceStatus(
-          pointedLatitude: element.lat,
-          pointedLongitude: element.lng,
-          radiusMeter: element.radInMtrs,
-          position: widget.currentPosition);
-      if (geofenceData['event'] == GeofenceEvent.inside) {
-        _insideGeofencesData.add(geofenceData);
+  Future<OfficeGeofence?> getTargetOffice(List<OfficeGeofence> offices) async {
+    List<OfficeGeofence> insideOffices = [];
+    for (var office in offices) {
+      OfficeGeofence returnedOffice = await Geofence.getGeofenceStatus(
+          officeGeofence: office, position: widget.currentPosition);
+      if (returnedOffice.distanceFromCurrentLocation != null)
+        insideOffices.add(returnedOffice);
+    }
+
+    OfficeGeofence? minDistOffice;
+    if (insideOffices.isNotEmpty) {
+      minDistOffice = insideOffices[0];
+      double minDist = insideOffices[0].distanceFromCurrentLocation!;
+      insideOffices.forEach((element) {
+        if (element.distanceFromCurrentLocation! < minDist) {
+          minDist = element.distanceFromCurrentLocation!;
+          minDistOffice = element;
+        }
+      });
+    }
+    return minDistOffice;
+  }
+
+  AttendanceSlot? getCurrentSlot(List<AttendanceSlot> slots) {
+    DateTime now = DateTime.now();
+    AttendanceSlot? currentSlot;
+    slots.forEach((element) {
+      DateTime startTime = DateTime(now.year, now.month, now.day,
+          element.startTime.hour, element.startTime.minute);
+      DateTime endTime = DateTime(now.year, now.month, now.day,
+          element.endTime.hour, element.endTime.minute);
+      if (now.isAfter(startTime) && now.isBefore(endTime)) {
+        currentSlot = element;
       }
     });
+    return currentSlot;
   }
 
-  startTimeStream() {
-    Duration dur = Duration(seconds: 1);
-    Stream<void> stream = Stream<String>.periodic(dur, callback);
-  }
+  // startTimeStream() {
+  //   Duration dur = Duration(seconds: 1);
+  //   Stream<void> stream = Stream<String>.periodic(dur, callback);
+  // }
 
-  String callback(value) {
-    DateTime _now = DateTime.now();
-    return 'Current timestamp: ${_now.hour}:${_now.minute}:${_now.second}.${_now.millisecond}';
-  }
+  // String callback(value) {
+  //   DateTime _now = DateTime.now();
+  //   return 'Current timestamp: ${_now.hour}:${_now.minute}:${_now.second}.${_now.millisecond}';
+  // }
 
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     _markers = getMarkers();
     _circles = getCircles();
-    return new Scaffold(
-      appBar: AppBar(
-        title: Text('Mark Attendance'),
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(
-            Feather.chevron_left,
-          ),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.bgLinearGradient),
-        ),
-      ),
-      body: Column(
-        children: [
-          Container(
-            height: height * 0.6,
-            child: GoogleMap(
-              mapType: MapType.normal,
-              initialCameraPosition: CameraPosition(
-                target: LatLng(widget.currentPosition.latitude,
-                    widget.currentPosition.longitude),
-                zoom: 16,
-              ),
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-              myLocationEnabled: true,
-              markers: _markers,
-              circles: _circles,
+    print('Build called');
+    return _isLoading
+        ? Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
             ),
-          ),
-          OfficeInfoWidget()
-        ],
-      ),
-      floatingActionButton: Visibility(
-        visible: _isTimeSlot,
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (_) => CameraScreen()));
-          },
-          label: Text('Mark Attendance'),
-          icon: Icon(Feather.user_check),
-          backgroundColor: AppColors.green,
-          foregroundColor: AppColors.textColor,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
+          )
+        : new Scaffold(
+            appBar: AppBar(
+              title: Text('Mark Attendance'),
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(
+                  Feather.chevron_left,
+                ),
+              ),
+              flexibleSpace: Container(
+                decoration: BoxDecoration(gradient: AppColors.bgLinearGradient),
+              ),
+            ),
+            body: Column(
+              children: [
+                Container(
+                  height: height * 0.6,
+                  child: GoogleMap(
+                    mapType: MapType.normal,
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(widget.currentPosition.latitude,
+                          widget.currentPosition.longitude),
+                      zoom: 16,
+                    ),
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller.complete(controller);
+                    },
+                    myLocationEnabled: true,
+                    markers: _markers,
+                    circles: _circles,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: CardWidget(
+                      children: [Text(attendanceInfo)], width: double.infinity),
+                )
+              ],
+            ),
+            floatingActionButton: Visibility(
+              visible: _isVisible,
+              child: FloatingActionButton.extended(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => CameraScreen()));
+                },
+                label: Text('Mark Attendance'),
+                icon: Icon(Feather.user_check),
+                backgroundColor: AppColors.green,
+                foregroundColor: AppColors.textColor,
+              ),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+          );
   }
 
   // Future<void> _goToMyLocation() async {
@@ -197,19 +252,5 @@ class _MapScreenState extends State<MapScreen> {
       ));
     }
     return _circles;
-  }
-}
-
-class OfficeInfoWidget extends StatelessWidget {
-  final String? officeName;
-  const OfficeInfoWidget({Key? key, this.officeName}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CardWidget(children: [
-      Text(officeName != null
-          ? 'Mark your attendance at $officeName'
-          : 'You can only mark attendance from a CRIS Office.\n[All CRIS offices are shown with markers on the Google Map.]')
-    ], width: double.infinity);
   }
 }

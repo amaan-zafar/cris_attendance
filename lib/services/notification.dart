@@ -1,4 +1,5 @@
 import 'package:cris_attendance/models/attendance_slots.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -11,7 +12,6 @@ class ReminderService {
   ReminderService(this._flutterLocalNotificationsPlugin);
   String? selectedNotificationPayload;
 
-  // Initialise
   Future initialise() async {
     await _configureLocalTimeZone();
     final NotificationAppLaunchDetails? notificationAppLaunchDetails =
@@ -43,26 +43,23 @@ class ReminderService {
     if (payload != null) {
       print('notification payload: $payload');
     }
-    // await Navigator.push(
-    //   context,
-    //   MaterialPageRoute<void>(builder: (context) => MapScreen(currentPosition: currentPosition)(payload)),
-    // );
   }
 
-  Future instantNotif() async {
-    var android = AndroidNotificationDetails('id', 'Channel', 'Desc');
-    var platform = NotificationDetails(android: android);
-    await _flutterLocalNotificationsPlugin.show(
-        0, 'Demo instant notif', 'Mark attendance', platform,
-        payload: "Welcom");
-  }
+  // Future instantNotif() async {
+  //   var android = AndroidNotificationDetails('id', 'Channel', 'Desc');
+  //   var platform = NotificationDetails(android: android);
+  //   await _flutterLocalNotificationsPlugin.show(
+  //       0, 'Demo instant notif', 'Mark attendance', platform,
+  //       payload: "Welcom");
+  // }
 
   Future scheduledNotif(List<AttendanceSlot> slots) async {
-    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    final DateTime now = DateTime.now();
+    print('Now time is $now');
     await _flutterLocalNotificationsPlugin.zonedSchedule(
         0,
         'Mark your Attendance',
-        "It's ${now.hour}:${now.minute}. Mark your attendance now",
+        "It's time to mark your attendance",
         _nextInstanceOfDateTime(now, slots),
         const NotificationDetails(
             android: AndroidNotificationDetails(
@@ -76,40 +73,33 @@ class ReminderService {
   }
 
   tz.TZDateTime _nextInstanceOfDateTime(
-      tz.TZDateTime now, List<AttendanceSlot> slots) {
-    int hour = slots[0].startTime.hour;
-    int min = slots[0].startTime.minute;
-    slots.forEach((element) {
-      if (now.isBefore(DateTime(now.year, now.month, now.day,
-          element.startTime.hour, element.endTime.minute))) {
-        hour = element.startTime.hour;
-        min = element.startTime.minute;
+      DateTime now, List<AttendanceSlot> slots) {
+    tz.TZDateTime scheduledDateTime = tz.TZDateTime(tz.local, now.year,
+        now.month, now.day, slots[0].startTime.hour, slots[0].startTime.minute);
+
+    AttendanceSlot nextSlot = slots.firstWhere((element) {
+      tz.TZDateTime startTime = tz.TZDateTime(tz.local, now.year, now.month,
+          now.day, element.startTime.hour, element.startTime.minute);
+      if (now.isBefore(startTime)) {
+        scheduledDateTime = startTime;
+        return true;
+      } else {
+        return false;
       }
+    }, orElse: () {
+      scheduledDateTime = tz.TZDateTime(tz.local, now.year, now.month, now.day,
+          slots[0].startTime.hour, slots[0].startTime.minute);
+      return slots[0];
     });
-    // if (now.isBefore(DateTime(now.year, now.month, now.day, 9, 0))) {
-    //   hour = 9;
-    //   min = 0;
-    // } else if (now.isBefore(DateTime(now.year, now.month, now.day, 12))) {
-    //   hour = 12;
-    //   min = 0;
-    // } else if (now.isBefore(DateTime(now.year, now.month, now.day, 15))) {
-    //   hour = 15;
-    //   min = 0;
-    // } else {
-    //   hour = 9;
-    //   min = 0;
-    // }
-    tz.TZDateTime scheduledDate =
-        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, min);
 
     // When scheduled date is past, update the scheduled date
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    if (scheduledDateTime.isBefore(now)) {
+      scheduledDateTime = scheduledDateTime.add(const Duration(days: 1));
     }
-    if (scheduledDate.weekday == DateTime.sunday) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    if (scheduledDateTime.weekday == DateTime.sunday) {
+      scheduledDateTime = scheduledDateTime.add(const Duration(days: 1));
     }
-    print('scheduled date time is $scheduledDate');
-    return scheduledDate;
+    print('scheduled date time is $scheduledDateTime');
+    return scheduledDateTime;
   }
 }

@@ -97,7 +97,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
     try {
       position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.best,
-          timeLimit: Duration(seconds: 10));
+          timeLimit: Duration(seconds: 20));
       print('Current position is $position');
       return position;
     } catch (e) {

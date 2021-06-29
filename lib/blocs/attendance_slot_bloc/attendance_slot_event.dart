@@ -6,3 +6,11 @@ abstract class AttendanceSlotEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class GetSlots extends AttendanceSlotEvent {
+  final String leagueCode;
+
+  GetSlots({required this.leagueCode});
+  @override
+  List<Object> get props => [];
+}
