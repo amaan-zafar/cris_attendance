@@ -12,7 +12,10 @@ TextTheme textTheme = TextTheme(
       fontSize: 34, fontWeight: FontWeight.w400, letterSpacing: 0.25),
   headline5: GoogleFonts.archivo(fontSize: 24, fontWeight: FontWeight.w400),
   headline6: GoogleFonts.archivo(
-      fontSize: 20, fontWeight: FontWeight.w500, letterSpacing: 0.15),
+      fontSize: 20,
+      fontWeight: FontWeight.w500,
+      letterSpacing: 0.15,
+      color: AppColors.textColor),
   subtitle1: GoogleFonts.archivo(
       fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.15),
   subtitle2: GoogleFonts.archivo(
@@ -27,4 +30,4 @@ TextTheme textTheme = TextTheme(
       fontSize: 12, fontWeight: FontWeight.w400, letterSpacing: 0.4),
   overline: GoogleFonts.poppins(
       fontSize: 10, fontWeight: FontWeight.w400, letterSpacing: 1.5),
-).apply(bodyColor: AppColors.textColor, displayColor: AppColors.textColor);
+);

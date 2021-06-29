@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   static const Color green = Color(0xFF1DDFB0);
   static const Color textColor = Color(0xFF3F2E5C);
+
   static const Color bgColorBeginGradient = Color(0xFF4e54c8);
   static const Color bgColorEndGradient = Color(0xFF8f94fb);
 

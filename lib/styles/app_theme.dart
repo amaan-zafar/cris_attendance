@@ -12,7 +12,8 @@ class AppTheme {
         brightness: Brightness.light,
         primaryColor: Colors.blue,
         scaffoldBackgroundColor: AppColors.white,
-        textTheme: textTheme,
+        textTheme: textTheme.apply(
+            bodyColor: AppColors.textColor, displayColor: AppColors.textColor),
         iconTheme: IconThemeData(color: AppColors.grey2)
         // buttonTheme: ButtonThemeData(
         //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
