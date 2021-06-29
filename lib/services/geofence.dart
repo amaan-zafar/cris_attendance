@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:cris_attendance/models/employee.dart';
+import 'package:cris_attendance/models/office_geofence.dart';
 import 'package:geolocator/geolocator.dart';
 
 enum GeofenceEvent { inside, outside }

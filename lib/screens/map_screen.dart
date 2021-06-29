@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:cris_attendance/models/attendance_slots.dart';
-import 'package:cris_attendance/models/employee.dart';
+import 'package:cris_attendance/models/office_geofence.dart';
 import 'package:cris_attendance/screens/camera_screen.dart';
 import 'package:cris_attendance/services/geofence.dart';
 import 'package:cris_attendance/styles/colors.dart';
