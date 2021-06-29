@@ -57,9 +57,19 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                           style: _textTheme.headline6,
                         ),
                       ),
-                      Text(
-                        '2019B3PS0463P',
-                        style: _textTheme.subtitle1,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Employee ID: ',
+                            style: _textTheme.subtitle1!
+                                .copyWith(fontWeight: FontWeight.w500),
+                          ),
+                          Text(
+                            '${state.employee.empID}',
+                            style: _textTheme.subtitle1,
+                          ),
+                        ],
                       ),
                       SizedBox(height: 16),
                     ],

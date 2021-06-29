@@ -19,7 +19,7 @@ class BackgroundWidget extends StatelessWidget {
                 // color: Colors.blue,
                 gradient: AppColors.bgLinearGradient,
                 borderRadius:
-                    BorderRadius.vertical(bottom: Radius.circular(16))),
+                    BorderRadius.vertical(bottom: Radius.circular(48))),
           ),
           Container(
             margin:
