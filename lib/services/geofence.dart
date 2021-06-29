@@ -10,7 +10,7 @@ class Geofence {
     return double.parse(value);
   }
 
-  static Future<GeofenceEvent> getGeofenceStatus(
+  static Future<Map<String, dynamic>> getGeofenceStatus(
       {required String pointedLatitude,
       required String pointedLongitude,
       required String radiusMeter,
@@ -23,7 +23,12 @@ class Geofence {
         latitude, longitude, position.latitude, position.longitude);
     print('dist is $distanceInMeters');
     print('radius is $radiusMeter');
-    return _checkGeofence(distanceInMeters, radiusInMeter);
+    Map<String, dynamic> geofenceData = {
+      'event': _checkGeofence(distanceInMeters, radiusInMeter),
+      'distance': distanceInMeters
+    };
+
+    return geofenceData;
   }
 
   /// [_checkGeofence] is for checking whether current location is in

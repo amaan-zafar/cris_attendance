@@ -1,4 +1,4 @@
-import 'package:cris_attendance/models/attendance.dart';
+import 'package:cris_attendance/models/attendance_slots.dart';
 import 'package:cris_attendance/screens/map_screen.dart';
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/background.dart';

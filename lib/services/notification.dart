@@ -1,3 +1,4 @@
+import 'package:cris_attendance/models/attendance_slots.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -56,13 +57,13 @@ class ReminderService {
         payload: "Welcom");
   }
 
-  Future scheduledNotif() async {
+  Future scheduledNotif(List<AttendanceSlot> slots) async {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     await _flutterLocalNotificationsPlugin.zonedSchedule(
         0,
         'Mark your Attendance',
         "It's ${now.hour}:${now.minute}. Mark your attendance now",
-        _nextInstanceOfDateTime(now),
+        _nextInstanceOfDateTime(now, slots),
         const NotificationDetails(
             android: AndroidNotificationDetails(
                 'Attendance Notification Channel Id',
@@ -74,22 +75,30 @@ class ReminderService {
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime);
   }
 
-  tz.TZDateTime _nextInstanceOfDateTime(tz.TZDateTime now) {
-    int hour;
-    int min;
-    if (now.isBefore(DateTime(now.year, now.month, now.day, 9, 0))) {
-      hour = 9;
-      min = 0;
-    } else if (now.isBefore(DateTime(now.year, now.month, now.day, 12))) {
-      hour = 12;
-      min = 0;
-    } else if (now.isBefore(DateTime(now.year, now.month, now.day, 15))) {
-      hour = 15;
-      min = 0;
-    } else {
-      hour = 9;
-      min = 0;
-    }
+  tz.TZDateTime _nextInstanceOfDateTime(
+      tz.TZDateTime now, List<AttendanceSlot> slots) {
+    int hour = slots[0].startTime.hour;
+    int min = slots[0].startTime.minute;
+    slots.forEach((element) {
+      if (now.isBefore(DateTime(now.year, now.month, now.day,
+          element.startTime.hour, element.endTime.minute))) {
+        hour = element.startTime.hour;
+        min = element.startTime.minute;
+      }
+    });
+    // if (now.isBefore(DateTime(now.year, now.month, now.day, 9, 0))) {
+    //   hour = 9;
+    //   min = 0;
+    // } else if (now.isBefore(DateTime(now.year, now.month, now.day, 12))) {
+    //   hour = 12;
+    //   min = 0;
+    // } else if (now.isBefore(DateTime(now.year, now.month, now.day, 15))) {
+    //   hour = 15;
+    //   min = 0;
+    // } else {
+    //   hour = 9;
+    //   min = 0;
+    // }
     tz.TZDateTime scheduledDate =
         tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, min);
 

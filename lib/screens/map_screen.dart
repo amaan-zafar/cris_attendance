@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:cris_attendance/models/attendance.dart';
+import 'package:cris_attendance/models/attendance_slots.dart';
 import 'package:cris_attendance/models/employee.dart';
 import 'package:cris_attendance/screens/camera_screen.dart';
 import 'package:cris_attendance/services/geofence.dart';
@@ -27,7 +27,9 @@ class _MapScreenState extends State<MapScreen> {
 
   late Position _currentPosition;
 
-  List<OfficeGeofence> _insideOffices = [];
+  List<Map<String, dynamic>> _insideGeofencesData = [];
+
+  OfficeGeofence? selectedOffice;
 
   Set<Marker> _markers = {};
 
@@ -39,12 +41,12 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     _offices = [
       OfficeGeofence(
-          officeName: "School",
+          officeName: "Office 1",
           lat: "25.58790",
           lng: "85.09500",
           radInMtrs: "80"),
       OfficeGeofence(
-          officeName: "Dominoz",
+          officeName: "Office 2",
           lat: "25.585381090862434",
           lng: "85.09535758698132",
           radInMtrs: "100"),
@@ -52,21 +54,21 @@ class _MapScreenState extends State<MapScreen> {
           officeName: "Office 3",
           lat: "25.587476691908993",
           lng: "85.09496933762402",
-          radInMtrs: "150"),
+          radInMtrs: "100"),
     ];
     slots = [
       AttendanceSlot(
-          slotNumber: 0,
+          slotNumber: 1,
           status: AttendanceStatus.NotMarked,
           startTime: TimeOfDay(hour: 9, minute: 0),
           endTime: TimeOfDay(hour: 9, minute: 30)),
       AttendanceSlot(
-          slotNumber: 1,
+          slotNumber: 2,
           status: AttendanceStatus.NotMarked,
           startTime: TimeOfDay(hour: 12, minute: 0),
           endTime: TimeOfDay(hour: 12, minute: 30)),
       AttendanceSlot(
-          slotNumber: 2,
+          slotNumber: 3,
           status: AttendanceStatus.NotMarked,
           startTime: TimeOfDay(hour: 15, minute: 0),
           endTime: TimeOfDay(hour: 15, minute: 30)),
@@ -77,16 +79,15 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   getInsideOffices() {
-    GeofenceEvent event;
+    Map<String, dynamic> geofenceData;
     _offices.forEach((element) async {
-      event = await Geofence.getGeofenceStatus(
+      geofenceData = await Geofence.getGeofenceStatus(
           pointedLatitude: element.lat,
           pointedLongitude: element.lng,
           radiusMeter: element.radInMtrs,
           position: widget.currentPosition);
-      if (event == GeofenceEvent.inside) {
-        _insideOffices.add(element);
-        print('office is ${element.officeName}');
+      if (geofenceData['event'] == GeofenceEvent.inside) {
+        _insideGeofencesData.add(geofenceData);
       }
     });
   }
@@ -138,9 +139,7 @@ class _MapScreenState extends State<MapScreen> {
               circles: _circles,
             ),
           ),
-          CardWidget(
-              children: [Text('Mark your attendance at Office 1')],
-              width: double.infinity)
+          OfficeInfoWidget()
         ],
       ),
       floatingActionButton: Visibility(
@@ -198,5 +197,19 @@ class _MapScreenState extends State<MapScreen> {
       ));
     }
     return _circles;
+  }
+}
+
+class OfficeInfoWidget extends StatelessWidget {
+  final String? officeName;
+  const OfficeInfoWidget({Key? key, this.officeName}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CardWidget(children: [
+      Text(officeName != null
+          ? 'Mark your attendance at $officeName'
+          : 'You can only mark attendance from a CRIS Office.\n[All CRIS offices are shown with markers on the Google Map.]')
+    ], width: double.infinity);
   }
 }
