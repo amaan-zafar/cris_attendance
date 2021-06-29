@@ -6,9 +6,9 @@ class EmployeeDetailsRepository {
 
   EmployeeDetailsRepository(this.apiProvider);
 
-  Future<void> fetchStandings({required String leagueCode}) async {
+  Future<Employee> fetchEmpDetails() async {
     final response = await apiProvider.get('myresource');
     print('EmpDetailsRepo res is $response');
-    // return Employee.fromJson(response['bean'][0]);
+    return Employee.fromJson(response['bean'][0]);
   }
 }

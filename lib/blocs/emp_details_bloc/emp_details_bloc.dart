@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:cris_attendance/models/employee.dart';
 import 'package:cris_attendance/repositories/employee_details_repo.dart';
 import 'package:equatable/equatable.dart';
 
@@ -16,6 +17,16 @@ class EmpDetailsBloc extends Bloc<EmpDetailsEvent, EmpDetailsState> {
   Stream<EmpDetailsState> mapEventToState(
     EmpDetailsEvent event,
   ) async* {
-    // TODO: implement mapEventToState
+    if (event is GetEmployee) {
+      yield EmployeeLoading(message: 'Loading employee details...');
+      try {
+        final Employee employee =
+            await _employeeDetailsRepository.fetchEmpDetails();
+        yield EmployeeLoaded(employee: employee);
+      } catch (e) {
+        yield EmployeeError(
+            message: 'Error in fetching employee details : ${e.toString()}');
+      }
+    }
   }
 }

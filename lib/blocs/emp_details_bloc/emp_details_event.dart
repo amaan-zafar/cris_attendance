@@ -6,3 +6,9 @@ abstract class EmpDetailsEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class GetEmployee extends EmpDetailsEvent {
+  GetEmployee();
+  @override
+  List<Object> get props => [];
+}
