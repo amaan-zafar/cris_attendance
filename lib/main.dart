@@ -1,8 +1,10 @@
 import 'package:cris_attendance/blocs/attendance_slot_bloc/attendance_slot_bloc.dart';
 import 'package:cris_attendance/blocs/bloc_observer.dart';
+import 'package:cris_attendance/blocs/emp_details_bloc/emp_details_bloc.dart';
 import 'package:cris_attendance/models/attendance_slots.dart';
 import 'package:cris_attendance/network/api_base_helper.dart';
 import 'package:cris_attendance/repositories/attendance_slots_repo.dart';
+import 'package:cris_attendance/repositories/employee_details_repo.dart';
 import 'package:cris_attendance/screens/employee_details.dart';
 import 'package:cris_attendance/services/notification.dart';
 import 'package:cris_attendance/styles/app_theme.dart';
@@ -24,6 +26,9 @@ void main() async {
       AttendanceSlotsRepository(apiProvider: _provider);
   var _slots = _slotsRepo.fetchSlots();
 
+  final EmployeeDetailsRepository _empDetailsRepo =
+      EmployeeDetailsRepository(_provider);
+
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   ReminderService _reminderService =
@@ -31,19 +36,23 @@ void main() async {
   await _reminderService.initialise();
   await _reminderService.scheduledNotif(_slots);
 
-  runApp(MyApp(_slots));
+  runApp(MyApp(slots: _slots, empDetailsRepo: _empDetailsRepo));
 }
 
 class MyApp extends StatelessWidget {
-  final List<AttendanceSlot> _slots;
-  MyApp(this._slots);
+  final List<AttendanceSlot> slots;
+  final EmployeeDetailsRepository empDetailsRepo;
+  MyApp({required this.slots, required this.empDetailsRepo});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AttendanceSlotBloc(_slots),
+          create: (context) => AttendanceSlotBloc(slots),
+        ),
+        BlocProvider(
+          create: (context) => EmpDetailsBloc(empDetailsRepo),
         ),
       ],
       child: MaterialApp(
