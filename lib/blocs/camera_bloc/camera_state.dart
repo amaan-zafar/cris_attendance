@@ -21,16 +21,22 @@ class ImageClicked extends CameraState {
   List<Object> get props => [];
 }
 
+class SavingImage extends CameraState {
+  const SavingImage();
+  @override
+  List<Object> get props => [];
+}
+
 class AttendanceCompleted extends CameraState {
   const AttendanceCompleted();
   @override
   List<Object> get props => [];
 }
 
-class EmployeeError extends CameraState {
+class CameraError extends CameraState {
   final String message;
 
-  const EmployeeError({required this.message});
+  const CameraError({required this.message});
   @override
   List<Object> get props => [message];
 }

@@ -1,6 +1,8 @@
 import 'package:cris_attendance/blocs/attendance_slot_bloc/attendance_slot_bloc.dart';
 import 'package:cris_attendance/blocs/bloc_observer.dart';
+import 'package:cris_attendance/blocs/camera_bloc/camera_bloc.dart';
 import 'package:cris_attendance/blocs/emp_details_bloc/emp_details_bloc.dart';
+import 'package:cris_attendance/blocs/map_screen_bloc/map_screen_bloc.dart';
 import 'package:cris_attendance/models/attendance_slots.dart';
 import 'package:cris_attendance/network/api_base_helper.dart';
 import 'package:cris_attendance/repositories/attendance_slots_repo.dart';
@@ -48,12 +50,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => AttendanceSlotBloc(slots),
-        ),
-        BlocProvider(
-          create: (context) => EmpDetailsBloc(empDetailsRepo),
-        ),
+        BlocProvider(create: (context) => AttendanceSlotBloc(slots)),
+        BlocProvider(create: (context) => EmpDetailsBloc(empDetailsRepo)),
+        BlocProvider(create: (context) => MapScreenBloc()),
+        BlocProvider(create: (context) => CameraBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
