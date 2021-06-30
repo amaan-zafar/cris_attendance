@@ -8,7 +8,8 @@ abstract class MapScreenEvent extends Equatable {
 }
 
 class LoadMapScreen extends MapScreenEvent {
-  const LoadMapScreen();
+  const LoadMapScreen(this.currentPosition);
+  final Position currentPosition;
   @override
-  List<Object> get props => [];
+  List<Object> get props => [currentPosition];
 }

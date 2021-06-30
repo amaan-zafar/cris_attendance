@@ -14,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:cris_attendance/globals/globals.dart' as globals;
 
 class MapScreen extends StatefulWidget {
   final Position currentPosition;
@@ -25,41 +26,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   Completer<GoogleMapController> _controller = Completer();
 
-  List<OfficeGeofence> _offices = [
-    OfficeGeofence(
-        officeName: "Office 1",
-        lat: "25.58790",
-        lng: "85.09500",
-        radInMtrs: "80"),
-    OfficeGeofence(
-        officeName: "Office 2",
-        lat: "25.585381090862434",
-        lng: "85.09535758698132",
-        radInMtrs: "100"),
-    OfficeGeofence(
-        officeName: "Office 3",
-        lat: "25.582476691908993",
-        lng: "85.09496933762402",
-        radInMtrs: "100"),
-  ];
-
-  List<AttendanceSlot> slots = [
-    AttendanceSlot(
-        slotNumber: 1,
-        status: AttendanceStatus.NotMarked,
-        startTime: TimeOfDay(hour: 9, minute: 0),
-        endTime: TimeOfDay(hour: 9, minute: 30)),
-    AttendanceSlot(
-        slotNumber: 2,
-        status: AttendanceStatus.NotMarked,
-        startTime: TimeOfDay(hour: 12, minute: 0),
-        endTime: TimeOfDay(hour: 12, minute: 30)),
-    AttendanceSlot(
-        slotNumber: 3,
-        status: AttendanceStatus.NotMarked,
-        startTime: TimeOfDay(hour: 15, minute: 45),
-        endTime: TimeOfDay(hour: 17, minute: 0)),
-  ];
+  List<OfficeGeofence> _offices = globals.offices;
 
   AttendanceSlot? currentSlot;
   OfficeGeofence? targetOffice;
@@ -77,7 +44,7 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void initState() {
-    currentSlot = getCurrentSlot(slots);
+    currentSlot = getCurrentSlot(globals.attendanceSlots);
     getTargetOffice(_offices).then((value) {
       targetOffice = value;
       print('Office is $targetOffice and slot is $currentSlot');
@@ -139,96 +106,83 @@ class _MapScreenState extends State<MapScreen> {
     return currentSlot;
   }
 
-  // startTimeStream() {
-  //   Duration dur = Duration(seconds: 1);
-  //   Stream<void> stream = Stream<String>.periodic(dur, callback);
-  // }
-
-  // String callback(value) {
-  //   DateTime _now = DateTime.now();
-  //   return 'Current timestamp: ${_now.hour}:${_now.minute}:${_now.second}.${_now.millisecond}';
-  // }
-
   @override
   Widget build(BuildContext context) {
-    final standingsBloc = BlocProvider.of<MapScreenBloc>(context);
-    standingsBloc.add(LoadMapScreen());
+    BlocProvider.of<MapScreenBloc>(context)
+        .add(LoadMapScreen(widget.currentPosition));
     var height = MediaQuery.of(context).size.height;
     _markers = getMarkers();
     _circles = getCircles();
-    print('Build called');
-    return _isLoading
-        ? Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
-        : new Scaffold(
-            appBar: AppBar(
-              title: Text('Mark Attendance'),
-              leading: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: Icon(
-                  Feather.chevron_left,
-                ),
-              ),
-              flexibleSpace: Container(
-                decoration: BoxDecoration(gradient: AppColors.bgLinearGradient),
-              ),
-            ),
-            body: BlocBuilder<MapScreenBloc, MapScreenState>(
-              builder: (context, state) {
-                if (state is LoadingMapScreen)
-                  return LoadingWidget(text: state.message);
-                if (state is MapScreenLoaded)
-                  return Column(
-                    children: [
-                      Container(
-                        height: height * 0.6,
-                        child: GoogleMap(
-                          mapType: MapType.normal,
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(widget.currentPosition.latitude,
-                                widget.currentPosition.longitude),
-                            zoom: 16,
+    return BlocBuilder<MapScreenBloc, MapScreenState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: buildAppBar(context),
+          body: state is LoadingMapScreen
+              ? LoadingWidget(text: state.message)
+              : state is MapScreenLoaded
+                  ? Column(
+                      children: [
+                        Container(
+                          height: height * 0.6,
+                          child: GoogleMap(
+                            mapType: MapType.normal,
+                            initialCameraPosition: CameraPosition(
+                              target: LatLng(widget.currentPosition.latitude,
+                                  widget.currentPosition.longitude),
+                              zoom: 16,
+                            ),
+                            onMapCreated: (GoogleMapController controller) {
+                              _controller.complete(controller);
+                            },
+                            myLocationEnabled: true,
+                            markers: _markers,
+                            circles: _circles,
                           ),
-                          onMapCreated: (GoogleMapController controller) {
-                            _controller.complete(controller);
-                          },
-                          myLocationEnabled: true,
-                          markers: _markers,
-                          circles: _circles,
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: CardWidget(
-                            children: [Text(attendanceInfo)],
-                            width: double.infinity),
-                      )
-                    ],
-                  );
-                if (state is MapScreenError)
-                  return CustomErrorWidget(errorMsg: state.message);
-                return Container();
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: CardWidget(
+                              children: [Text(state.attendanceInfo)],
+                              width: double.infinity),
+                        )
+                      ],
+                    )
+                  : state is MapScreenError
+                      ? CustomErrorWidget(errorMsg: state.message)
+                      : Container(),
+          floatingActionButton: Visibility(
+            visible: _isVisible,
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => CameraScreen()));
               },
+              label: Text('Mark Attendance'),
+              icon: Icon(Feather.user_check),
+              backgroundColor: AppColors.green,
+              foregroundColor: AppColors.textColor,
             ),
-            floatingActionButton: Visibility(
-              visible: _isVisible,
-              child: FloatingActionButton.extended(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => CameraScreen()));
-                },
-                label: Text('Mark Attendance'),
-                icon: Icon(Feather.user_check),
-                backgroundColor: AppColors.green,
-                foregroundColor: AppColors.textColor,
-              ),
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
-          );
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+        );
+      },
+    );
+  }
+
+  AppBar buildAppBar(BuildContext context) {
+    return AppBar(
+      title: Text('Mark Attendance'),
+      leading: IconButton(
+        onPressed: () => Navigator.pop(context),
+        icon: Icon(
+          Feather.chevron_left,
+        ),
+      ),
+      flexibleSpace: Container(
+        decoration: BoxDecoration(gradient: AppColors.bgLinearGradient),
+      ),
+    );
   }
 
   Set<Marker> getMarkers() {

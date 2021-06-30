@@ -213,3 +213,14 @@ class _CameraScreenState extends State<CameraScreen> {
 
 typedef void OnPickImageCallback(
     double? maxWidth, double? maxHeight, int? quality);
+
+
+  // startTimeStream() {
+  //   Duration dur = Duration(seconds: 1);
+  //   Stream<void> stream = Stream<String>.periodic(dur, callback);
+  // }
+
+  // String callback(value) {
+  //   DateTime _now = DateTime.now();
+  //   return 'Current timestamp: ${_now.hour}:${_now.minute}:${_now.second}.${_now.millisecond}';
+  // }

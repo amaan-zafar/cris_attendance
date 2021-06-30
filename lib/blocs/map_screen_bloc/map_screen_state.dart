@@ -18,11 +18,11 @@ class LoadingMapScreen extends MapScreenState {
 }
 
 class MapScreenLoaded extends MapScreenState {
-  final String message;
+  final String attendanceInfo;
 
-  const MapScreenLoaded({required this.message});
+  const MapScreenLoaded({required this.attendanceInfo});
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [attendanceInfo];
 }
 
 class MapScreenError extends MapScreenState {

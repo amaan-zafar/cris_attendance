@@ -1,9 +1,7 @@
-import 'package:cris_attendance/blocs/attendance_slot_bloc/attendance_slot_bloc.dart';
 import 'package:cris_attendance/blocs/bloc_observer.dart';
 import 'package:cris_attendance/blocs/camera_bloc/camera_bloc.dart';
 import 'package:cris_attendance/blocs/emp_details_bloc/emp_details_bloc.dart';
 import 'package:cris_attendance/blocs/map_screen_bloc/map_screen_bloc.dart';
-import 'package:cris_attendance/models/attendance_slots.dart';
 import 'package:cris_attendance/network/api_base_helper.dart';
 import 'package:cris_attendance/repositories/attendance_slots_repo.dart';
 import 'package:cris_attendance/repositories/employee_details_repo.dart';
@@ -14,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:cris_attendance/globals/globals.dart' as globals;
 
 void main() async {
   // needed if you intend to initialize in the `main` function
@@ -26,7 +25,7 @@ void main() async {
 
   final AttendanceSlotsRepository _slotsRepo =
       AttendanceSlotsRepository(apiProvider: _provider);
-  var _slots = _slotsRepo.fetchSlots();
+  globals.attendanceSlots = _slotsRepo.fetchSlots();
 
   final EmployeeDetailsRepository _empDetailsRepo =
       EmployeeDetailsRepository(_provider);
@@ -36,21 +35,19 @@ void main() async {
   ReminderService _reminderService =
       ReminderService(flutterLocalNotificationsPlugin);
   await _reminderService.initialise();
-  await _reminderService.scheduledNotif(_slots);
+  await _reminderService.scheduledNotif(globals.attendanceSlots);
 
-  runApp(MyApp(slots: _slots, empDetailsRepo: _empDetailsRepo));
+  runApp(MyApp(empDetailsRepo: _empDetailsRepo));
 }
 
 class MyApp extends StatelessWidget {
-  final List<AttendanceSlot> slots;
   final EmployeeDetailsRepository empDetailsRepo;
-  MyApp({required this.slots, required this.empDetailsRepo});
+  MyApp({required this.empDetailsRepo});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => AttendanceSlotBloc(slots)),
         BlocProvider(create: (context) => EmpDetailsBloc(empDetailsRepo)),
         BlocProvider(create: (context) => MapScreenBloc()),
         BlocProvider(create: (context) => CameraBloc()),
