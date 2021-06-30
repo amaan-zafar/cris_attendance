@@ -25,7 +25,7 @@ class EmpDetailsBloc extends Bloc<EmpDetailsEvent, EmpDetailsState> {
         yield EmployeeLoaded(employee: employee);
       } catch (e) {
         yield EmployeeError(
-            message: 'Error in fetching employee details : ${e.toString()}');
+            message: 'Error in fetching employee details. ${e.toString()}');
       }
     }
   }
