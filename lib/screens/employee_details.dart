@@ -3,6 +3,7 @@ import 'package:cris_attendance/screens/map_screen.dart';
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/background.dart';
 import 'package:cris_attendance/widgets/card.dart';
+import 'package:cris_attendance/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -29,17 +30,13 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
           decoration: BoxDecoration(gradient: AppColors.bgLinearGradient),
         ),
       ),
-      body: BackgroundWidget(
-        child: BlocBuilder<EmpDetailsBloc, EmpDetailsState>(
-          builder: (context, state) {
-            if (state is EmployeeLoading)
-              return Center(
-                child: Column(
-                  children: [CircularProgressIndicator(), Text(state.message)],
-                ),
-              );
-            if (state is EmployeeLoaded)
-              return Column(
+      body: BlocBuilder<EmpDetailsBloc, EmpDetailsState>(
+        builder: (context, state) {
+          if (state is EmployeeLoading)
+            return LoadingWidget(text: state.message);
+          if (state is EmployeeLoaded)
+            return BackgroundWidget(
+              child: Column(
                 children: [
                   CardWidget(
                     children: [
@@ -91,10 +88,10 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                     SizedBox(height: 12),
                   ], width: double.infinity)
                 ],
-              );
-            return Container();
-          },
-        ),
+              ),
+            );
+          return Container();
+        },
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
