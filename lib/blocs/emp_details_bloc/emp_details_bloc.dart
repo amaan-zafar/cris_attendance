@@ -4,7 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:cris_attendance/models/employee.dart';
 import 'package:cris_attendance/repositories/employee_details_repo.dart';
 import 'package:equatable/equatable.dart';
-import 'package:geolocator/geolocator.dart';
 
 part 'emp_details_event.dart';
 part 'emp_details_state.dart';
