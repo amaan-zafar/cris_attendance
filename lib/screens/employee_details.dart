@@ -10,90 +10,64 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geolocator/geolocator.dart';
 
-class EmployeeDetailsScreen extends StatefulWidget {
+class EmployeeDetailsScreen extends StatelessWidget {
   const EmployeeDetailsScreen({Key? key}) : super(key: key);
-
-  @override
-  _EmployeeDetailsScreenState createState() => _EmployeeDetailsScreenState();
-}
-
-class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
-  bool _fabIsVisible = false;
 
   @override
   Widget build(BuildContext context) {
     final standingsBloc = BlocProvider.of<EmpDetailsBloc>(context);
     standingsBloc.add(GetEmployee());
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Employee Details'),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.bgLinearGradient),
-        ),
-      ),
-      body: BlocBuilder<EmpDetailsBloc, EmpDetailsState>(
-        builder: (context, state) {
-          if (state is EmployeeLoading)
-            return LoadingWidget(text: state.message);
-          if (state is EmployeeLoaded) {
-            setState(() {
-              _fabIsVisible = true;
-            });
-            return EmployeeDetailsScreenBody(state: state);
-          }
-          if (state is EmployeeError)
-            return CustomErrorWidget(errorMsg: state.message);
-          return Container();
-        },
-      ),
-      floatingActionButton: Visibility(
-        visible: _fabIsVisible,
-        child: FloatingActionButton.extended(
-          onPressed: () async {
-            Position? position = await _getCurrentLocation();
-            position != null
-                ? Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => MapScreen(
-                              currentPosition: position,
-                            )))
-                : print('Null current positon');
-          },
-          label: Text('Mark Attendance'),
-          icon: Icon(MaterialCommunityIcons.page_next),
-          backgroundColor: AppColors.green,
-          foregroundColor: AppColors.textColor,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    return BlocBuilder<EmpDetailsBloc, EmpDetailsState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: buildAppBar(),
+          body: state is EmployeeLoading
+              ? LoadingWidget(text: state.message)
+              : state is EmployeeLoaded
+                  ? buildBody(context, state)
+                  : state is EmployeeError
+                      ? CustomErrorWidget(errorMsg: state.message)
+                      : Container(),
+          floatingActionButton: state is EmployeeLoaded
+              ? FloatingActionButton.extended(
+                  onPressed: () async {
+                    try {
+                      Position position = await Geolocator.getCurrentPosition(
+                          desiredAccuracy: LocationAccuracy.best,
+                          timeLimit: Duration(seconds: 20));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => MapScreen(
+                                    currentPosition: position,
+                                  )));
+                    } catch (e) {
+                      print('Error in getting location: ${e.toString()}');
+                    }
+                  },
+                  label: Text('Mark Attendance'),
+                  icon: Icon(MaterialCommunityIcons.page_next),
+                  backgroundColor: AppColors.green,
+                  foregroundColor: AppColors.textColor,
+                )
+              : Container(),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+        );
+      },
     );
   }
 
-  Future<Position?> _getCurrentLocation() async {
-    Position position;
-    try {
-      position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best,
-          timeLimit: Duration(seconds: 20));
-      print('Current position is $position');
-      return position;
-    } catch (e) {
-      print('Error in getting current position : ${e.toString()}');
-    }
-    return null;
+  AppBar buildAppBar() {
+    return AppBar(
+      title: Text('Employee Details'),
+      flexibleSpace: Container(
+        decoration: BoxDecoration(gradient: AppColors.bgLinearGradient),
+      ),
+    );
   }
-}
 
-class EmployeeDetailsScreenBody extends StatelessWidget {
-  const EmployeeDetailsScreenBody({Key? key, required this.state})
-      : super(key: key);
-
-  final EmployeeLoaded state;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget buildBody(BuildContext context, EmployeeLoaded state) {
     final _textTheme = Theme.of(context).textTheme;
     var height = MediaQuery.of(context).size.height;
     return BackgroundWidget(
@@ -133,7 +107,7 @@ class EmployeeDetailsScreenBody extends StatelessWidget {
             ],
             width: double.infinity,
           ),
-          SizedBox(height: height * 0.04),
+          SizedBox(height: height * 0.03),
           CardWidget(children: [
             SizedBox(height: 12),
             Text(
