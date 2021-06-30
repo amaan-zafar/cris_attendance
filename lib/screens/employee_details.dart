@@ -3,6 +3,7 @@ import 'package:cris_attendance/screens/map_screen.dart';
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/background.dart';
 import 'package:cris_attendance/widgets/card.dart';
+import 'package:cris_attendance/widgets/error.dart';
 import 'package:cris_attendance/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -90,7 +91,9 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                 ],
               ),
             );
-          return LoadingWidget(text: 'Error');
+          if (state is EmployeeError)
+            return CustomErrorWidget(errorMsg: state.message);
+          return Container();
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
