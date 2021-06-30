@@ -13,6 +13,11 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
   Stream<MapScreenState> mapEventToState(
     MapScreenEvent event,
   ) async* {
-    // TODO: implement mapEventToState
+    if (event is LoadMapScreen) {
+      yield LoadingMapScreen(message: 'Loading Geofences...');
+      try {} catch (e) {
+        yield MapScreenError(message: '${e.toString()}');
+      }
+    }
   }
 }

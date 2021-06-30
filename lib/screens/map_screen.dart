@@ -1,12 +1,16 @@
 import 'dart:async';
 
+import 'package:cris_attendance/blocs/map_screen_bloc/map_screen_bloc.dart';
 import 'package:cris_attendance/models/attendance_slots.dart';
 import 'package:cris_attendance/models/office_geofence.dart';
 import 'package:cris_attendance/screens/camera_screen.dart';
 import 'package:cris_attendance/services/geofence.dart';
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/card.dart';
+import 'package:cris_attendance/widgets/error.dart';
+import 'package:cris_attendance/widgets/loading.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -54,7 +58,7 @@ class _MapScreenState extends State<MapScreen> {
         slotNumber: 3,
         status: AttendanceStatus.NotMarked,
         startTime: TimeOfDay(hour: 15, minute: 45),
-        endTime: TimeOfDay(hour: 16, minute: 15)),
+        endTime: TimeOfDay(hour: 16, minute: 30)),
   ];
 
   AttendanceSlot? currentSlot;
@@ -147,6 +151,8 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final standingsBloc = BlocProvider.of<MapScreenBloc>(context);
+    standingsBloc.add(LoadMapScreen());
     var height = MediaQuery.of(context).size.height;
     _markers = getMarkers();
     _circles = getCircles();
@@ -170,31 +176,42 @@ class _MapScreenState extends State<MapScreen> {
                 decoration: BoxDecoration(gradient: AppColors.bgLinearGradient),
               ),
             ),
-            body: Column(
-              children: [
-                Container(
-                  height: height * 0.6,
-                  child: GoogleMap(
-                    mapType: MapType.normal,
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(widget.currentPosition.latitude,
-                          widget.currentPosition.longitude),
-                      zoom: 16,
-                    ),
-                    onMapCreated: (GoogleMapController controller) {
-                      _controller.complete(controller);
-                    },
-                    myLocationEnabled: true,
-                    markers: _markers,
-                    circles: _circles,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: CardWidget(
-                      children: [Text(attendanceInfo)], width: double.infinity),
-                )
-              ],
+            body: BlocBuilder<MapScreenBloc, MapScreenState>(
+              builder: (context, state) {
+                if (state is LoadingMapScreen)
+                  return LoadingWidget(text: state.message);
+                if (state is MapScreenLoaded)
+                  return Column(
+                    children: [
+                      Container(
+                        height: height * 0.6,
+                        child: GoogleMap(
+                          mapType: MapType.normal,
+                          initialCameraPosition: CameraPosition(
+                            target: LatLng(widget.currentPosition.latitude,
+                                widget.currentPosition.longitude),
+                            zoom: 16,
+                          ),
+                          onMapCreated: (GoogleMapController controller) {
+                            _controller.complete(controller);
+                          },
+                          myLocationEnabled: true,
+                          markers: _markers,
+                          circles: _circles,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: CardWidget(
+                            children: [Text(attendanceInfo)],
+                            width: double.infinity),
+                      )
+                    ],
+                  );
+                if (state is MapScreenError)
+                  return CustomErrorWidget(errorMsg: state.message);
+                return Container();
+              },
             ),
             floatingActionButton: Visibility(
               visible: _isVisible,
@@ -213,15 +230,6 @@ class _MapScreenState extends State<MapScreen> {
                 FloatingActionButtonLocation.centerFloat,
           );
   }
-
-  // Future<void> _goToMyLocation() async {
-  //   final GoogleMapController controller = await _controller.future;
-  //   controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-  //       bearing: 192.8334901395799,
-  //       target: LatLng(_currentPosition.latitude, _currentPosition.longitude),
-  //       tilt: 59.440717697143555,
-  //       zoom: 19.151926040649414)));
-  // }
 
   Set<Marker> getMarkers() {
     int i;

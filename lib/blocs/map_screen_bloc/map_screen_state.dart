@@ -9,6 +9,22 @@ abstract class MapScreenState extends Equatable {
 
 class MapScreenInitial extends MapScreenState {}
 
+class LoadingMapScreen extends MapScreenState {
+  final String message;
+
+  const LoadingMapScreen({required this.message});
+  @override
+  List<Object> get props => [message];
+}
+
+class MapScreenLoaded extends MapScreenState {
+  final String message;
+
+  const MapScreenLoaded({required this.message});
+  @override
+  List<Object> get props => [message];
+}
+
 class MapScreenError extends MapScreenState {
   final String message;
 

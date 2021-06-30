@@ -6,3 +6,9 @@ abstract class MapScreenEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class LoadMapScreen extends MapScreenEvent {
+  LoadMapScreen();
+  @override
+  List<Object> get props => [];
+}
