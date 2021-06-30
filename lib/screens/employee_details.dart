@@ -90,7 +90,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                 ],
               ),
             );
-          return Container();
+          return LoadingWidget(text: 'Error');
         },
       ),
       floatingActionButton: FloatingActionButton.extended(

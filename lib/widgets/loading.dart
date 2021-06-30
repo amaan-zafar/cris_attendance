@@ -1,5 +1,6 @@
-import 'package:cris_attendance/widgets/card.dart';
+import 'package:cris_attendance/styles/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoadingWidget extends StatelessWidget {
   const LoadingWidget({Key? key, required this.text}) : super(key: key);
@@ -8,18 +9,20 @@ class LoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
     return Center(
-      child: CardWidget(
-        width: width * 0.6,
-        height: width * 0.6,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(),
+          SpinKitThreeBounce(
+            color: AppColors.bgColorEndGradient,
+          ),
           SizedBox(
             height: 16,
           ),
-          Text(text)
+          Text(
+            text,
+            style: Theme.of(context).textTheme.subtitle1,
+          )
         ],
       ),
     );
