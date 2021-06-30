@@ -58,7 +58,7 @@ class _MapScreenState extends State<MapScreen> {
         slotNumber: 3,
         status: AttendanceStatus.NotMarked,
         startTime: TimeOfDay(hour: 15, minute: 45),
-        endTime: TimeOfDay(hour: 16, minute: 30)),
+        endTime: TimeOfDay(hour: 17, minute: 0)),
   ];
 
   AttendanceSlot? currentSlot;
