@@ -18,23 +18,23 @@ List<AttendanceSlot> attendanceSlots = [
   AttendanceSlot(
       slotNumber: 3,
       status: AttendanceStatus.NotMarked,
-      startTime: TimeOfDay(hour: 15, minute: 45),
-      endTime: TimeOfDay(hour: 17, minute: 0)),
+      startTime: TimeOfDay(hour: 15, minute: 30),
+      endTime: TimeOfDay(hour: 16, minute: 30)),
 ];
 
 List<OfficeGeofence> offices = [
   OfficeGeofence(
-      officeName: "Office 1",
+      officeName: "CRIS Office 1",
       lat: "25.58790",
       lng: "85.09500",
       radInMtrs: "80"),
   OfficeGeofence(
-      officeName: "Office 2",
+      officeName: "CRIS Office 2",
       lat: "25.585381090862434",
       lng: "85.09535758698132",
       radInMtrs: "100"),
   OfficeGeofence(
-      officeName: "Office 3",
+      officeName: "CRIS Office 3",
       lat: "25.582476691908993",
       lng: "85.09496933762402",
       radInMtrs: "100"),

@@ -26,6 +26,7 @@ class EmpDetailsBloc extends Bloc<EmpDetailsEvent, EmpDetailsState> {
       } catch (e) {
         yield EmployeeError(
             message: 'Error in fetching employee details. ${e.toString()}');
+        // yield EmployeeLoaded(employee: Employee(firstName: 'Aneesh', lastName: 'Ballabh', email: 'aneesh@gmail.com', dateOfBirth: '15-06-2000', empID: 2019, gender: 'male'));
       }
     }
   }

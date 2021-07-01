@@ -103,9 +103,20 @@ class _CameraScreenState extends State<CameraScreen> {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                     case ConnectionState.waiting:
-                      return const Text(
-                        'You have not yet clicked an image.',
-                        textAlign: TextAlign.center,
+                      return Column(
+                        children: [
+                          Image(
+                            image: AssetImage('assets/images/selfie.png'),
+                            fit: BoxFit.cover,
+                          ),
+                          SizedBox(
+                            height: 18,
+                          ),
+                          const Text(
+                            'You have not yet clicked an image.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       );
                     case ConnectionState.done:
                       return _previewImage();
@@ -116,9 +127,20 @@ class _CameraScreenState extends State<CameraScreen> {
                           textAlign: TextAlign.center,
                         );
                       } else {
-                        return const Text(
-                          'You have not yet clicked an image.',
-                          textAlign: TextAlign.center,
+                        return Column(
+                          children: [
+                            Image(
+                              image: AssetImage('assets/images/selfie.png'),
+                              fit: BoxFit.cover,
+                            ),
+                            SizedBox(
+                              height: 18,
+                            ),
+                            const Text(
+                              'You have not yet clicked an image.',
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         );
                       }
                   }
@@ -133,6 +155,7 @@ class _CameraScreenState extends State<CameraScreen> {
         heroTag: 'image1',
         tooltip: 'Take a Photo',
         child: const Icon(Icons.camera_alt),
+        backgroundColor: AppColors.bgColorBeginGradient,
       ),
     );
   }

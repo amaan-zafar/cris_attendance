@@ -20,8 +20,25 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
   ) async* {
     if (event is LoadMapScreen) {
       yield LoadingMapScreen(message: 'Loading geofences...');
-      String attendanceInfo =
-          'You can only mark attendance from a CRIS Office.\n[All CRIS offices are shown with markers on the Google Map.]';
+      try {
+        String slotInfo, officeInfo;
+        bool canMark;
+        AttendanceSlot? currentSlot = getCurrentSlot();
+        slotInfo = currentSlot != null
+            ? '${currentSlot.startTime.hour}:${currentSlot.startTime.minute}-${currentSlot.endTime.hour}:${currentSlot.endTime.minute}'
+            : 'Time Window Closed';
+        final OfficeGeofence? targetOffice =
+            await getTargetOffice(globals.offices, event.currentPosition);
+        officeInfo = targetOffice != null
+            ? '${targetOffice.officeName} [${targetOffice.distanceFromCurrentLocation!.toStringAsFixed(2)}meters]'
+            : 'Not with any CRIS office geofence';
+        canMark = currentSlot != null || targetOffice != null ? true : false;
+        yield MapScreenLoaded(
+            officeInfo: officeInfo, slotInfo: slotInfo, canMark: canMark);
+      } catch (e) {
+        MapScreenError(
+            message: 'Error in getting target office: ${e.toString()}');
+      }
     }
   }
 
@@ -34,7 +51,6 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
       if (returnedOffice.distanceFromCurrentLocation != null)
         insideOffices.add(returnedOffice);
     }
-
     OfficeGeofence? minDistOffice;
     if (insideOffices.isNotEmpty) {
       minDistOffice = insideOffices[0];
@@ -52,7 +68,7 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
   AttendanceSlot? getCurrentSlot() {
     DateTime now = DateTime.now();
     AttendanceSlot? currentSlot;
-    globals.attendanceSlots!.forEach((element) {
+    globals.attendanceSlots.forEach((element) {
       DateTime startTime = DateTime(now.year, now.month, now.day,
           element.startTime.hour, element.startTime.minute);
       DateTime endTime = DateTime(now.year, now.month, now.day,

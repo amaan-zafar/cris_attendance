@@ -15,9 +15,7 @@ class CustomErrorWidget extends StatelessWidget {
             image: AssetImage('assets/images/no-data-error.png'),
             fit: BoxFit.cover,
           ),
-          SizedBox(
-            height: 18,
-          ),
+          SizedBox(height: 18),
           Text(
             errorMsg,
             style: Theme.of(context)
