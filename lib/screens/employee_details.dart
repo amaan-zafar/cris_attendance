@@ -26,7 +26,12 @@ class EmployeeDetailsScreen extends StatelessWidget {
               : state is EmployeeLoaded
                   ? buildBody(context, state)
                   : state is EmployeeError
-                      ? CustomErrorWidget(errorMsg: state.message)
+                      ? CustomErrorWidget(
+                          errorMsg: state.message,
+                          onPressed: () =>
+                              BlocProvider.of<EmpDetailsBloc>(context)
+                                  .add(GetEmployee()),
+                        )
                       : Container(),
           floatingActionButton: state is EmployeeLoaded
               ? FloatingActionButton.extended(

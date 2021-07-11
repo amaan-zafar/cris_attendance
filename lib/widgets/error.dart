@@ -1,8 +1,12 @@
+import 'package:cris_attendance/styles/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 
 class CustomErrorWidget extends StatelessWidget {
   final String errorMsg;
-  const CustomErrorWidget({Key? key, required this.errorMsg}) : super(key: key);
+  final void Function()? onPressed;
+  const CustomErrorWidget({Key? key, required this.errorMsg, this.onPressed})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +26,24 @@ class CustomErrorWidget extends StatelessWidget {
                 .textTheme
                 .caption!
                 .copyWith(fontWeight: FontWeight.w500, fontSize: 14),
+          ),
+          MaterialButton(
+            onPressed: onPressed,
+            color: AppColors.bgColorEndGradient,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Ionicons.refresh_sharp,
+                  color: Colors.white,
+                ),
+                Text(
+                  'Retry',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
           )
         ],
       ),
