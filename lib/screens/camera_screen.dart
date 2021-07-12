@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cris_attendance/styles/colors.dart';
+import 'package:cris_attendance/widgets/card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -17,44 +18,57 @@ class _CameraScreenState extends State<CameraScreen> {
   PickedFile? _imageFile;
   dynamic _pickImageError;
   String? _retrieveDataError;
+  String? metadata;
 
   final ImagePicker _picker = ImagePicker();
-  final TextEditingController maxWidthController = TextEditingController();
-  final TextEditingController maxHeightController = TextEditingController();
-  final TextEditingController qualityController = TextEditingController();
 
   void _onImageButtonPressed(ImageSource source,
       {BuildContext? context}) async {
-    await _displayPickImageDialog(context!,
-        (double? maxWidth, double? maxHeight, int? quality) async {
-      try {
-        final pickedFile = await _picker.getImage(
-          source: source,
-          maxWidth: maxWidth,
-          maxHeight: maxHeight,
-          imageQuality: quality,
-        );
-        setState(() {
-          _imageFile = pickedFile;
-        });
-      } catch (e) {
-        print('Error on picking is ${e.toString()}');
-        setState(() {
-          _pickImageError = e;
-        });
-      }
-    });
+    try {
+      final pickedFile = await _picker.getImage(source: source);
+      metadata = await pickedFile!.readAsString();
+      print('Metadata is $metadata');
+      setState(() {
+        _imageFile = pickedFile;
+      });
+    } catch (e) {
+      print('Error on picking is ${e.toString()}');
+      setState(() {
+        _pickImageError = e;
+      });
+    }
   }
 
   Widget _previewImage() {
+    final _textTheme = Theme.of(context).textTheme;
+
     final Text? retrieveError = _getRetrieveErrorWidget();
     if (retrieveError != null) {
       return retrieveError;
     }
     if (_imageFile != null) {
-      return Semantics(
-          child: Image.file(File(_imageFile!.path)),
-          label: 'image_picker_example_picked_image');
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: Semantics(
+                child: Image.file(File(_imageFile!.path)),
+                label: 'image_picker_picked_image'),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: CardWidget(children: [
+              Text(
+                'Metadata Information',
+                style:
+                    _textTheme.bodyText1!.copyWith(fontWeight: FontWeight.w600),
+              ),
+              // Text(_imageFile.readAsString())
+            ], width: double.infinity),
+          )
+        ],
+      );
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',
@@ -152,7 +166,6 @@ class _CameraScreenState extends State<CameraScreen> {
         onPressed: () {
           _onImageButtonPressed(ImageSource.camera, context: context);
         },
-        heroTag: 'image1',
         tooltip: 'Take a Photo',
         child: const Icon(Icons.camera_alt),
         backgroundColor: AppColors.bgColorBeginGradient,
@@ -168,82 +181,7 @@ class _CameraScreenState extends State<CameraScreen> {
     }
     return null;
   }
-
-  @override
-  void dispose() {
-    maxWidthController.dispose();
-    maxHeightController.dispose();
-    qualityController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _displayPickImageDialog(
-      BuildContext context, OnPickImageCallback onPick) async {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Add optional parameters'),
-            content: Column(
-              children: <Widget>[
-                TextField(
-                  controller: maxWidthController,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  decoration:
-                      InputDecoration(hintText: "Enter maxWidth if desired"),
-                ),
-                TextField(
-                  controller: maxHeightController,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  decoration:
-                      InputDecoration(hintText: "Enter maxHeight if desired"),
-                ),
-                TextField(
-                  controller: qualityController,
-                  keyboardType: TextInputType.number,
-                  decoration:
-                      InputDecoration(hintText: "Enter quality if desired"),
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('CANCEL'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                  child: const Text('PICK'),
-                  onPressed: () {
-                    double? width = maxWidthController.text.isNotEmpty
-                        ? double.parse(maxWidthController.text)
-                        : null;
-                    double? height = maxHeightController.text.isNotEmpty
-                        ? double.parse(maxHeightController.text)
-                        : null;
-                    int? quality = qualityController.text.isNotEmpty
-                        ? int.parse(qualityController.text)
-                        : null;
-                    onPick(width, height, quality);
-                    Navigator.of(context).pop();
-                  }),
-            ],
-          );
-        });
-  }
 }
 
 typedef void OnPickImageCallback(
     double? maxWidth, double? maxHeight, int? quality);
-
-
-  // startTimeStream() {
-  //   Duration dur = Duration(seconds: 1);
-  //   Stream<void> stream = Stream<String>.periodic(dur, callback);
-  // }
-
-  // String callback(value) {
-  //   DateTime _now = DateTime.now();
-  //   return 'Current timestamp: ${_now.hour}:${_now.minute}:${_now.second}.${_now.millisecond}';
-  // }
