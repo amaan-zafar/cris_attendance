@@ -5,7 +5,6 @@ import 'package:cris_attendance/models/office_geofence.dart';
 import 'package:cris_attendance/screens/camera_screen.dart';
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/card.dart';
-import 'package:cris_attendance/widgets/empty_state.dart';
 import 'package:cris_attendance/widgets/error.dart';
 import 'package:cris_attendance/widgets/loading.dart';
 import 'package:flutter/material.dart';
@@ -125,7 +124,10 @@ class _MapScreenState extends State<MapScreen> {
       child: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (_) => CameraScreen()));
+              context,
+              MaterialPageRoute(
+                  builder: (_) =>
+                      CameraScreen(currentPosition: widget.currentPosition)));
         },
         label: Text('Mark Attendance'),
         icon: Icon(Feather.user_check),

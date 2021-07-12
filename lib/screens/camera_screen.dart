@@ -2,14 +2,19 @@ import 'dart:io';
 
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/card.dart';
+import 'package:cris_attendance/widgets/error.dart';
 import 'package:cris_attendance/widgets/loading.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:native_exif/native_exif.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({Key? key}) : super(key: key);
+  final Position currentPosition;
+  const CameraScreen({required this.currentPosition, Key? key})
+      : super(key: key);
 
   @override
   _CameraScreenState createState() => _CameraScreenState();
@@ -19,15 +24,21 @@ class _CameraScreenState extends State<CameraScreen> {
   PickedFile? _imageFile;
   dynamic _pickImageError;
   String? _retrieveDataError;
-  String metadata = '';
-  bool hasGpsData = false;
+  Map<String, Object>? metadata;
 
   final ImagePicker _picker = ImagePicker();
 
-  void _onImageButtonPressed(ImageSource source,
-      {BuildContext? context}) async {
+  void _getImage(ImageSource source) async {
     try {
       final pickedFile = await _picker.getImage(source: source);
+      if (pickedFile != null) {
+        Exif exif = await Exif.fromPath(pickedFile.path);
+        await exif.writeAttributes({
+          'GPSLongitude': '${widget.currentPosition.longitude}',
+          'GPSLatitude': '${widget.currentPosition.latitude}'
+        });
+        metadata = await exif.getAttributes();
+      }
       setState(() {
         _imageFile = pickedFile;
       });
@@ -52,30 +63,33 @@ class _CameraScreenState extends State<CameraScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              height: MediaQuery.of(context).size.height * 0.6,
+              margin: const EdgeInsets.all(16),
+              height: MediaQuery.of(context).size.height * 0.4,
+              width: MediaQuery.of(context).size.height * 0.4,
               child: Semantics(
-                  child: Image.file(File(_imageFile!.path)),
+                  child: Image.file(
+                    File(_imageFile!.path),
+                    fit: BoxFit.cover,
+                  ),
                   label: 'image_picker_picked_image'),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 64),
               child: CardWidget(children: [
                 Text(
-                  'Metadata Information',
+                  'Geotagged Data',
                   style: _textTheme.bodyText1!
                       .copyWith(fontWeight: FontWeight.w600),
                 ),
-                Text(metadata)
+                Text(metadata.toString())
               ], width: double.infinity),
             )
           ],
         ),
       );
     } else if (_pickImageError != null) {
-      return Text(
-        'Pick image error: $_pickImageError',
-        textAlign: TextAlign.center,
-      );
+      return CustomErrorWidget(
+          errorMsg: 'Error in picking image : $_pickImageError');
     } else {
       return Column(
         children: [
@@ -138,10 +152,9 @@ class _CameraScreenState extends State<CameraScreen> {
                       return _previewImage();
                     default:
                       if (snapshot.hasError) {
-                        return Text(
-                          'Pick image/video error: ${snapshot.error}}',
-                          textAlign: TextAlign.center,
-                        );
+                        return CustomErrorWidget(
+                            errorMsg:
+                                'Error in picking image : ${snapshot.error}');
                       } else {
                         return Column(
                           children: [
@@ -164,15 +177,26 @@ class _CameraScreenState extends State<CameraScreen> {
               )
             : _previewImage(),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text('Click Selfie'),
-        onPressed: () {
-          _onImageButtonPressed(ImageSource.camera, context: context);
-        },
-        tooltip: 'Take a Photo',
-        icon: const Icon(Icons.camera_alt),
-        backgroundColor: AppColors.bgColorBeginGradient,
-      ),
+      floatingActionButton: _imageFile == null
+          ? FloatingActionButton.extended(
+              label: Text('Click Selfie'),
+              onPressed: () {
+                _getImage(ImageSource.camera);
+              },
+              tooltip: 'Take a Photo',
+              icon: const Icon(Icons.camera_alt),
+              backgroundColor: AppColors.bgColorBeginGradient,
+            )
+          : FloatingActionButton.extended(
+              onPressed: () {},
+              label: Text('Complete Attendance'),
+              icon: Icon(Feather.user_check),
+              backgroundColor: AppColors.green,
+              foregroundColor: AppColors.textColor,
+            ),
+      floatingActionButtonLocation: _imageFile != null
+          ? FloatingActionButtonLocation.centerFloat
+          : FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -185,6 +209,3 @@ class _CameraScreenState extends State<CameraScreen> {
     return null;
   }
 }
-
-typedef void OnPickImageCallback(
-    double? maxWidth, double? maxHeight, int? quality);
