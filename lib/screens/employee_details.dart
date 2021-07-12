@@ -3,7 +3,6 @@ import 'package:cris_attendance/screens/map_screen.dart';
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/background.dart';
 import 'package:cris_attendance/widgets/card.dart';
-import 'package:cris_attendance/widgets/empty_state.dart';
 import 'package:cris_attendance/widgets/error.dart';
 import 'package:cris_attendance/widgets/loading.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +32,7 @@ class EmployeeDetailsScreen extends StatelessWidget {
                               BlocProvider.of<EmpDetailsBloc>(context)
                                   .add(GetEmployee()),
                         )
-                      : EmptyStateWidget(),
+                      : Container(),
           floatingActionButton: state is EmployeeLoaded
               ? FloatingActionButton.extended(
                   onPressed: () async {
@@ -56,7 +55,7 @@ class EmployeeDetailsScreen extends StatelessWidget {
                   backgroundColor: AppColors.green,
                   foregroundColor: AppColors.textColor,
                 )
-              : EmptyStateWidget(),
+              : Container(),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
         );

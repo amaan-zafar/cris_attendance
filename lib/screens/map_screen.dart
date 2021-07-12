@@ -55,7 +55,7 @@ class _MapScreenState extends State<MapScreen> {
                               BlocProvider.of<MapScreenBloc>(context)
                                   .add(LoadMapScreen(widget.currentPosition)),
                         )
-                      : EmptyStateWidget(),
+                      : Container(),
           floatingActionButton: _buildFab(state, context),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
@@ -112,7 +112,7 @@ class _MapScreenState extends State<MapScreen> {
             Text('Time Slot : ${state.slotInfo}'),
             state.canMark == false
                 ? Text('You cannot mark the attendance')
-                : EmptyStateWidget()
+                : Container()
           ], width: double.infinity),
         )
       ],

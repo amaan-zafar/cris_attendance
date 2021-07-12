@@ -23,12 +23,12 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
       try {
         String slotInfo, officeInfo;
         bool canMark;
-        AttendanceSlot? currentSlot = getCurrentSlot();
+        AttendanceSlot? currentSlot = _getCurrentSlot();
         slotInfo = currentSlot != null
             ? '${currentSlot.startTime.hour}:${currentSlot.startTime.minute}-${currentSlot.endTime.hour}:${currentSlot.endTime.minute}'
             : 'Time Window Closed';
         final OfficeGeofence? targetOffice =
-            await getTargetOffice(globals.offices, event.currentPosition);
+            await _getTargetOffice(globals.offices, event.currentPosition);
         officeInfo = targetOffice != null
             ? '${targetOffice.officeName} [${targetOffice.distanceFromCurrentLocation!.toStringAsFixed(2)}meters]'
             : 'Not with any CRIS office geofence';
@@ -42,7 +42,7 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
     }
   }
 
-  Future<OfficeGeofence?> getTargetOffice(
+  Future<OfficeGeofence?> _getTargetOffice(
       List<OfficeGeofence> offices, Position position) async {
     List<OfficeGeofence> insideOffices = [];
     for (var office in offices) {
@@ -65,7 +65,7 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
     return minDistOffice;
   }
 
-  AttendanceSlot? getCurrentSlot() {
+  AttendanceSlot? _getCurrentSlot() {
     DateTime now = DateTime.now();
     AttendanceSlot? currentSlot;
     globals.attendanceSlots.forEach((element) {
