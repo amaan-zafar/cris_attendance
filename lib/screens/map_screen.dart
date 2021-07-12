@@ -38,51 +38,16 @@ class _MapScreenState extends State<MapScreen> {
     var height = MediaQuery.of(context).size.height;
     final _textTheme = Theme.of(context).textTheme;
 
-    _markers = getMarkers();
-    _circles = getCircles();
+    _markers = _getMarkers();
+    _circles = _getCircles();
     return BlocBuilder<MapScreenBloc, MapScreenState>(
       builder: (context, state) {
         return Scaffold(
-          appBar: buildAppBar(context),
+          appBar: _buildAppBar(context),
           body: state is LoadingMapScreen
               ? LoadingWidget(text: state.message)
               : state is MapScreenLoaded
-                  ? Column(
-                      children: [
-                        Container(
-                          height: height * 0.6,
-                          child: GoogleMap(
-                            mapType: MapType.normal,
-                            initialCameraPosition: CameraPosition(
-                              target: LatLng(widget.currentPosition.latitude,
-                                  widget.currentPosition.longitude),
-                              zoom: 16,
-                            ),
-                            onMapCreated: (GoogleMapController controller) {
-                              _controller.complete(controller);
-                            },
-                            myLocationEnabled: true,
-                            markers: _markers,
-                            circles: _circles,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: CardWidget(children: [
-                            Text(
-                              'Attendance Information',
-                              style: _textTheme.bodyText1!
-                                  .copyWith(fontWeight: FontWeight.w600),
-                            ),
-                            Text('Office : ${state.officeInfo}'),
-                            Text('Time Slot : ${state.slotInfo}'),
-                            state.canMark == false
-                                ? Text('You cannot mark the attendance')
-                                : EmptyStateWidget()
-                          ], width: double.infinity),
-                        )
-                      ],
-                    )
+                  ? _buildLoadedScreen(height, _textTheme, state)
                   : state is MapScreenError
                       ? CustomErrorWidget(
                           errorMsg: state.message,
@@ -91,19 +56,7 @@ class _MapScreenState extends State<MapScreen> {
                                   .add(LoadMapScreen(widget.currentPosition)),
                         )
                       : EmptyStateWidget(),
-          floatingActionButton: Visibility(
-            visible: state is MapScreenLoaded ? state.canMark : false,
-            child: FloatingActionButton.extended(
-              onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => CameraScreen()));
-              },
-              label: Text('Mark Attendance'),
-              icon: Icon(Feather.user_check),
-              backgroundColor: AppColors.green,
-              foregroundColor: AppColors.textColor,
-            ),
-          ),
+          floatingActionButton: _buildFab(state, context),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
         );
@@ -111,7 +64,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  AppBar buildAppBar(BuildContext context) {
+  AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: Text('Mark Attendance'),
       leading: IconButton(
@@ -126,7 +79,63 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Set<Marker> getMarkers() {
+  Column _buildLoadedScreen(
+      double height, TextTheme _textTheme, MapScreenLoaded state) {
+    return Column(
+      children: [
+        Container(
+          height: height * 0.6,
+          child: GoogleMap(
+            mapType: MapType.normal,
+            initialCameraPosition: CameraPosition(
+              target: LatLng(widget.currentPosition.latitude,
+                  widget.currentPosition.longitude),
+              zoom: 16,
+            ),
+            onMapCreated: (GoogleMapController controller) {
+              _controller.complete(controller);
+            },
+            myLocationEnabled: true,
+            markers: _markers,
+            circles: _circles,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: CardWidget(children: [
+            Text(
+              'Attendance Information',
+              style:
+                  _textTheme.bodyText1!.copyWith(fontWeight: FontWeight.w600),
+            ),
+            Text('Office : ${state.officeInfo}'),
+            Text('Time Slot : ${state.slotInfo}'),
+            state.canMark == false
+                ? Text('You cannot mark the attendance')
+                : EmptyStateWidget()
+          ], width: double.infinity),
+        )
+      ],
+    );
+  }
+
+  Visibility _buildFab(MapScreenState state, BuildContext context) {
+    return Visibility(
+      visible: state is MapScreenLoaded ? state.canMark : false,
+      child: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => CameraScreen()));
+        },
+        label: Text('Mark Attendance'),
+        icon: Icon(Feather.user_check),
+        backgroundColor: AppColors.green,
+        foregroundColor: AppColors.textColor,
+      ),
+    );
+  }
+
+  Set<Marker> _getMarkers() {
     int i;
     for (i = 0; i < _offices.length; i++) {
       _markers.add(Marker(
@@ -141,7 +150,7 @@ class _MapScreenState extends State<MapScreen> {
     return _markers;
   }
 
-  Set<Circle> getCircles() {
+  Set<Circle> _getCircles() {
     int i;
     for (i = 0; i < _offices.length; i++) {
       _circles.add(Circle(
