@@ -1,10 +1,8 @@
 import 'dart:async';
 
 import 'package:cris_attendance/blocs/map_screen_bloc/map_screen_bloc.dart';
-import 'package:cris_attendance/models/attendance_slots.dart';
 import 'package:cris_attendance/models/office_geofence.dart';
 import 'package:cris_attendance/screens/camera_screen.dart';
-import 'package:cris_attendance/services/geofence.dart';
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/card.dart';
 import 'package:cris_attendance/widgets/empty_state.dart';
@@ -32,44 +30,6 @@ class _MapScreenState extends State<MapScreen> {
   Set<Marker> _markers = {};
 
   Set<Circle> _circles = {};
-
-  Future<OfficeGeofence?> getTargetOffice(List<OfficeGeofence> offices) async {
-    List<OfficeGeofence> insideOffices = [];
-    for (var office in offices) {
-      OfficeGeofence returnedOffice = await Geofence.getGeofenceStatus(
-          officeGeofence: office, position: widget.currentPosition);
-      if (returnedOffice.distanceFromCurrentLocation != null)
-        insideOffices.add(returnedOffice);
-    }
-
-    OfficeGeofence? minDistOffice;
-    if (insideOffices.isNotEmpty) {
-      minDistOffice = insideOffices[0];
-      double minDist = insideOffices[0].distanceFromCurrentLocation!;
-      insideOffices.forEach((element) {
-        if (element.distanceFromCurrentLocation! < minDist) {
-          minDist = element.distanceFromCurrentLocation!;
-          minDistOffice = element;
-        }
-      });
-    }
-    return minDistOffice;
-  }
-
-  AttendanceSlot? getCurrentSlot(List<AttendanceSlot> slots) {
-    DateTime now = DateTime.now();
-    AttendanceSlot? currentSlot;
-    slots.forEach((element) {
-      DateTime startTime = DateTime(now.year, now.month, now.day,
-          element.startTime.hour, element.startTime.minute);
-      DateTime endTime = DateTime(now.year, now.month, now.day,
-          element.endTime.hour, element.endTime.minute);
-      if (now.isAfter(startTime) && now.isBefore(endTime)) {
-        currentSlot = element;
-      }
-    });
-    return currentSlot;
-  }
 
   @override
   Widget build(BuildContext context) {
