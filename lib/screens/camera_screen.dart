@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/card.dart';
+import 'package:cris_attendance/widgets/loading.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -76,9 +77,23 @@ class _CameraScreenState extends State<CameraScreen> {
         textAlign: TextAlign.center,
       );
     } else {
-      return const Text(
-        'You have not yet clicked an image.',
-        textAlign: TextAlign.center,
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Image(
+              image: AssetImage('assets/images/selfie.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(
+            height: 18,
+          ),
+          const Text(
+            'Click your image to complete the attendance process.',
+            textAlign: TextAlign.center,
+          ),
+        ],
       );
     }
   }
@@ -118,21 +133,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                     case ConnectionState.waiting:
-                      return Column(
-                        children: [
-                          Image(
-                            image: AssetImage('assets/images/selfie.png'),
-                            fit: BoxFit.cover,
-                          ),
-                          SizedBox(
-                            height: 18,
-                          ),
-                          const Text(
-                            'You have not yet clicked an image.',
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      );
+                      return LoadingWidget(text: 'Loading');
                     case ConnectionState.done:
                       return _previewImage();
                     default:
@@ -163,12 +164,13 @@ class _CameraScreenState extends State<CameraScreen> {
               )
             : _previewImage(),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
+        label: Text('Click Selfie'),
         onPressed: () {
           _onImageButtonPressed(ImageSource.camera, context: context);
         },
         tooltip: 'Take a Photo',
-        child: const Icon(Icons.camera_alt),
+        icon: const Icon(Icons.camera_alt),
         backgroundColor: AppColors.bgColorBeginGradient,
       ),
     );
