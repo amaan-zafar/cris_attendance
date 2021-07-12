@@ -7,6 +7,7 @@ import 'package:cris_attendance/screens/camera_screen.dart';
 import 'package:cris_attendance/services/geofence.dart';
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/card.dart';
+import 'package:cris_attendance/widgets/empty_state.dart';
 import 'package:cris_attendance/widgets/error.dart';
 import 'package:cris_attendance/widgets/loading.dart';
 import 'package:flutter/material.dart';
@@ -31,30 +32,6 @@ class _MapScreenState extends State<MapScreen> {
   Set<Marker> _markers = {};
 
   Set<Circle> _circles = {};
-
-  // @override
-  // void initState() {
-  //   currentSlot = getCurrentSlot(globals.attendanceSlots);
-  //   getTargetOffice(_offices).then((value) {
-  //     targetOffice = value;
-  //     print('Office is ${targetOffice!.officeName} and slot is $currentSlot');
-  //     setState(() {
-  //       _isVisible = currentSlot != null && targetOffice != null ? true : false;
-  //     });
-  //     print('bool is $_isVisible');
-  //     if (targetOffice != null && currentSlot != null) {
-  //       attendanceInfo =
-  //           'Mark your attendance at ${targetOffice!.officeName} for time slot [${currentSlot!.startTime.hour}:${currentSlot!.startTime.minute}-${currentSlot!.endTime.hour}:${currentSlot!.endTime.minute}]';
-  //     } else if (targetOffice != null) {
-  //       attendanceInfo = 'You cannot mark the attendance now.';
-  //     } else {
-  //       attendanceInfo =
-  //           'You can only mark attendance from a CRIS Office.\n[All CRIS offices are shown with blue markers on the Map.]';
-  //     }
-  //   });
-
-  //   super.initState();
-  // }
 
   Future<OfficeGeofence?> getTargetOffice(List<OfficeGeofence> offices) async {
     List<OfficeGeofence> insideOffices = [];
@@ -141,14 +118,19 @@ class _MapScreenState extends State<MapScreen> {
                             Text('Time Slot : ${state.slotInfo}'),
                             state.canMark == false
                                 ? Text('You cannot mark the attendance')
-                                : Container()
+                                : EmptyStateWidget()
                           ], width: double.infinity),
                         )
                       ],
                     )
                   : state is MapScreenError
-                      ? CustomErrorWidget(errorMsg: state.message)
-                      : Container(),
+                      ? CustomErrorWidget(
+                          errorMsg: state.message,
+                          onPressed: () =>
+                              BlocProvider.of<MapScreenBloc>(context)
+                                  .add(LoadMapScreen(widget.currentPosition)),
+                        )
+                      : EmptyStateWidget(),
           floatingActionButton: Visibility(
             visible: state is MapScreenLoaded ? state.canMark : false,
             child: FloatingActionButton.extended(
