@@ -18,7 +18,8 @@ class _CameraScreenState extends State<CameraScreen> {
   PickedFile? _imageFile;
   dynamic _pickImageError;
   String? _retrieveDataError;
-  String? metadata;
+  String metadata = '';
+  bool hasGpsData = false;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -26,8 +27,6 @@ class _CameraScreenState extends State<CameraScreen> {
       {BuildContext? context}) async {
     try {
       final pickedFile = await _picker.getImage(source: source);
-      metadata = await pickedFile!.readAsString();
-      print('Metadata is $metadata');
       setState(() {
         _imageFile = pickedFile;
       });
@@ -47,27 +46,29 @@ class _CameraScreenState extends State<CameraScreen> {
       return retrieveError;
     }
     if (_imageFile != null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: Semantics(
-                child: Image.file(File(_imageFile!.path)),
-                label: 'image_picker_picked_image'),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: CardWidget(children: [
-              Text(
-                'Metadata Information',
-                style:
-                    _textTheme.bodyText1!.copyWith(fontWeight: FontWeight.w600),
-              ),
-              // Text(_imageFile.readAsString())
-            ], width: double.infinity),
-          )
-        ],
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: Semantics(
+                  child: Image.file(File(_imageFile!.path)),
+                  label: 'image_picker_picked_image'),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CardWidget(children: [
+                Text(
+                  'Metadata Information',
+                  style: _textTheme.bodyText1!
+                      .copyWith(fontWeight: FontWeight.w600),
+                ),
+                Text(metadata)
+              ], width: double.infinity),
+            )
+          ],
+        ),
       );
     } else if (_pickImageError != null) {
       return Text(
