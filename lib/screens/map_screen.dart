@@ -107,8 +107,28 @@ class _MapScreenState extends State<MapScreen> {
               style:
                   _textTheme.bodyText1!.copyWith(fontWeight: FontWeight.w600),
             ),
-            Text('Office : ${state.officeInfo}'),
-            Text('Time Slot : ${state.slotInfo}'),
+            RichText(
+                text: TextSpan(
+                    text: 'Office : ',
+                    style: _textTheme.bodyText1!
+                        .copyWith(fontWeight: FontWeight.w600),
+                    children: [
+                  TextSpan(
+                      text: '${state.officeInfo}',
+                      style: _textTheme.bodyText1!
+                          .copyWith(fontWeight: FontWeight.w500)),
+                ])),
+            RichText(
+                text: TextSpan(
+                    text: 'Time Slot : ',
+                    style: _textTheme.bodyText1!
+                        .copyWith(fontWeight: FontWeight.w600),
+                    children: [
+                  TextSpan(
+                      text: '${state.slotInfo}',
+                      style: _textTheme.bodyText1!
+                          .copyWith(fontWeight: FontWeight.w500)),
+                ])),
             state.canMark == false
                 ? Text('You cannot mark the attendance')
                 : Container()
