@@ -224,9 +224,11 @@ class _CameraScreenState extends State<CameraScreen> {
             else if (state is AttendanceCompleted) {
               Navigator.pop(context);
               return Container();
-            } else if (state is PostAttendanceError)
-              return CustomErrorWidget(errorMsg: state.message);
-            else
+            } else if (state is PostAttendanceError) {
+              Navigator.pop(context);
+              return Container();
+              // return CustomErrorWidget(errorMsg: state.message);
+            } else
               return Container();
           },
         ),

@@ -26,7 +26,10 @@ class ApiProvider {
     try {
       final response = await httpClient.post(
         Uri.parse(_baseUrl + url),
-        headers: {"Content-Type": "application/json; charset=UTF-8"},
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          'Charset': 'utf-8'
+        },
         body: jsonEncode(body),
       );
       responseJson = _response(response);
