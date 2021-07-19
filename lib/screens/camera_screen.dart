@@ -12,7 +12,6 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:native_exif/native_exif.dart';
-import 'package:path_provider/path_provider.dart';
 
 class CameraScreen extends StatefulWidget {
   final int empId;
