@@ -8,7 +8,8 @@ abstract class PostAttendanceEvent extends Equatable {
 }
 
 class PostAttendance extends PostAttendanceEvent {
-  PostAttendance();
+  final PostAttendanceModel attendanceModel;
+  const PostAttendance({required this.attendanceModel});
   @override
-  List<Object> get props => [];
+  List<Object> get props => [attendanceModel];
 }

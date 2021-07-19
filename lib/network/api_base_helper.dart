@@ -21,8 +21,8 @@ class ApiProvider {
     return responseJson;
   }
 
-  Future<dynamic> post(String url, Map body) async {
-    var responseJson;
+  Future<http.Response> post(String url, Map body) async {
+    http.Response responseJson;
     try {
       final response = await httpClient.post(
         Uri.parse(_baseUrl + url),

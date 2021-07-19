@@ -1,11 +1,11 @@
-class PostAttendance {
+class PostAttendanceModel {
   int empId;
   int slot;
   String date;
   String base64;
   String time;
 
-  PostAttendance(
+  PostAttendanceModel(
       {required this.empId,
       required this.slot,
       required this.date,

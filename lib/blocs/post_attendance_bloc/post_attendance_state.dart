@@ -9,26 +9,27 @@ abstract class PostAttendanceState extends Equatable {
 
 class PostAttendanceInitial extends PostAttendanceState {}
 
-class Loading extends PostAttendanceState {
+class PostAttendanceLoading extends PostAttendanceState {
   final String message;
 
-  const Loading({required this.message});
+  const PostAttendanceLoading({required this.message});
   @override
   List<Object> get props => [message];
 }
 
-class EmployeeLoaded extends PostAttendanceState {
-  final Employee employee;
+class AttendanceCompleted extends PostAttendanceState {
+  final Response response;
 
-  const EmployeeLoaded({required this.employee});
+  AttendanceCompleted(this.response);
+
   @override
-  List<Object> get props => [employee];
+  List<Object> get props => [response];
 }
 
-class Error extends PostAttendanceState {
+class PostAttendanceError extends PostAttendanceState {
   final String message;
 
-  const Error({required this.message});
+  const PostAttendanceError({required this.message});
   @override
   List<Object> get props => [message];
 }
