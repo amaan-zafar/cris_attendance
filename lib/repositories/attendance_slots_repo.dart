@@ -16,7 +16,7 @@ class AttendanceSlotsRepository {
       AttendanceSlot(
           slotNumber: 1,
           status: AttendanceStatus.NotMarked,
-          startTime: TimeOfDay(hour: 9, minute: 0),
+          startTime: TimeOfDay(hour: 1, minute: 0),
           endTime: TimeOfDay(hour: 9, minute: 30)),
       AttendanceSlot(
           slotNumber: 2,
@@ -26,8 +26,8 @@ class AttendanceSlotsRepository {
       AttendanceSlot(
           slotNumber: 3,
           status: AttendanceStatus.NotMarked,
-          startTime: TimeOfDay(hour: 15, minute: 30),
-          endTime: TimeOfDay(hour: 16, minute: 30)),
+          startTime: TimeOfDay(hour: 16, minute: 0),
+          endTime: TimeOfDay(hour: 17, minute: 30)),
     ];
   }
 }

@@ -18,6 +18,7 @@ class LoadingMapScreen extends MapScreenState {
 }
 
 class MapScreenLoaded extends MapScreenState {
+  final int? slotNum;
   final String officeInfo;
   final String slotInfo;
   final bool canMark;
@@ -25,7 +26,8 @@ class MapScreenLoaded extends MapScreenState {
   const MapScreenLoaded(
       {required this.officeInfo,
       required this.slotInfo,
-      required this.canMark});
+      required this.canMark,
+      this.slotNum});
   @override
   List<Object> get props => [officeInfo, slotInfo, canMark];
 }

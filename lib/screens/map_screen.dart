@@ -140,24 +140,26 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Visibility _buildFab(MapScreenState state, BuildContext context) {
-    return Visibility(
-      visible: state is MapScreenLoaded ? state.canMark : false,
-      child: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => CameraScreen(
-                      currentPosition: widget.currentPosition,
-                      empId: widget.empId)));
-        },
-        label: Text('Mark Attendance'),
-        icon: Icon(Feather.user_check),
-        backgroundColor: AppColors.green,
-        foregroundColor: AppColors.textColor,
-      ),
-    );
+  Widget _buildFab(MapScreenState state, BuildContext context) {
+    bool fabIsVisible = state is MapScreenLoaded && state.canMark;
+    return fabIsVisible
+        ? FloatingActionButton.extended(
+            onPressed: () {
+              print('slottt is ${state.slotNum}');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => CameraScreen(
+                          slotNum: state.slotNum,
+                          currentPosition: widget.currentPosition,
+                          empId: widget.empId)));
+            },
+            label: Text('Mark Attendance'),
+            icon: Icon(Feather.user_check),
+            backgroundColor: AppColors.green,
+            foregroundColor: AppColors.textColor,
+          )
+        : Container();
   }
 
   Set<Marker> _getMarkers() {

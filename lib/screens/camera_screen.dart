@@ -2,22 +2,30 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:cris_attendance/blocs/post_attendance_bloc/post_attendance_bloc.dart';
+import 'package:cris_attendance/models/post_attendance.dart';
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/card.dart';
 import 'package:cris_attendance/widgets/error.dart';
 import 'package:cris_attendance/widgets/loading.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:native_exif/native_exif.dart';
 
 class CameraScreen extends StatefulWidget {
+  final int? slotNum;
   final int empId;
   final Position currentPosition;
   const CameraScreen(
-      {required this.currentPosition, required this.empId, Key? key})
+      {required this.currentPosition,
+      required this.empId,
+      this.slotNum,
+      Key? key})
       : super(key: key);
 
   @override
@@ -54,11 +62,26 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
-  void _completeAttendance() async {
+  void _completeAttendance(BuildContext context) async {
+    final bloc = BlocProvider.of<PostAttendanceBloc>(context);
     if (_imageFile != null) {
       List<int> imgBytes = await _imageFile!.readAsBytes();
       String base64Img = base64Encode(imgBytes);
       print('base64 is $base64Img');
+      DateTime now = DateTime.now();
+      var dateFormatter = new DateFormat('yyyy-MM-dd');
+      var timeFormatter = new DateFormat('HH:mm:ss');
+      String formattedDate = dateFormatter.format(now);
+      String formattedTime = timeFormatter.format(now);
+      print('Formatted time is : $formattedTime');
+
+      bloc.add(PostAttendance(
+          attendanceModel: PostAttendanceModel(
+              base64: base64Img,
+              date: formattedDate,
+              empId: widget.empId,
+              slot: widget.slotNum!,
+              time: formattedTime)));
 
       // final path = await getApplicationDocumentsDirectory();
       // Uint8List bytes = base64Decode(base64Img);
@@ -159,8 +182,10 @@ class _CameraScreenState extends State<CameraScreen> {
         ),
       ),
       body: Center(
-        child: !kIsWeb && defaultTargetPlatform == TargetPlatform.android
-            ? FutureBuilder<void>(
+        child: BlocBuilder<PostAttendanceBloc, PostAttendanceState>(
+          builder: (context, state) {
+            if (state is PostAttendanceInitial)
+              return FutureBuilder<void>(
                 future: retrieveLostData(),
                 builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                   switch (snapshot.connectionState) {
@@ -193,8 +218,18 @@ class _CameraScreenState extends State<CameraScreen> {
                       }
                   }
                 },
-              )
-            : _previewImage(),
+              );
+            else if (state is PostAttendanceLoading)
+              return LoadingWidget(text: state.message);
+            else if (state is AttendanceCompleted) {
+              Navigator.pop(context);
+              return Container();
+            } else if (state is PostAttendanceError)
+              return CustomErrorWidget(errorMsg: state.message);
+            else
+              return Container();
+          },
+        ),
       ),
       floatingActionButton: _imageFile == null
           ? FloatingActionButton.extended(
@@ -208,7 +243,7 @@ class _CameraScreenState extends State<CameraScreen> {
             )
           : FloatingActionButton.extended(
               onPressed: () {
-                _completeAttendance();
+                _completeAttendance(context);
               },
               label: Text('Complete Attendance'),
               icon: Icon(Feather.user_check),

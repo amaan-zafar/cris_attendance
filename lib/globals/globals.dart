@@ -8,6 +8,7 @@ List<AttendanceSlot> attendanceSlots = [
   AttendanceSlot(
       slotNumber: 1,
       status: AttendanceStatus.NotMarked,
+      // TODO: Correct it
       startTime: TimeOfDay(hour: 9, minute: 0),
       endTime: TimeOfDay(hour: 9, minute: 30)),
   AttendanceSlot(
@@ -18,8 +19,8 @@ List<AttendanceSlot> attendanceSlots = [
   AttendanceSlot(
       slotNumber: 3,
       status: AttendanceStatus.NotMarked,
-      startTime: TimeOfDay(hour: 15, minute: 30),
-      endTime: TimeOfDay(hour: 16, minute: 30)),
+      startTime: TimeOfDay(hour: 15, minute: 0),
+      endTime: TimeOfDay(hour: 15, minute: 30)),
 ];
 
 List<OfficeGeofence> offices = [

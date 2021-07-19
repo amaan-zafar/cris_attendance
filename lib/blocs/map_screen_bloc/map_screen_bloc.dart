@@ -23,8 +23,10 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
       try {
         String slotInfo, officeInfo;
         bool canMark;
+        int? slot;
 
         AttendanceSlot? currentSlot = _getCurrentSlot();
+        if (currentSlot != null) slot = currentSlot.slotNumber;
 
         slotInfo = currentSlot != null
             ? '${currentSlot.startTime.hour}:${currentSlot.startTime.minute}-${currentSlot.endTime.hour}:${currentSlot.endTime.minute}'
@@ -40,7 +42,10 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
         canMark = currentSlot != null || targetOffice != null ? true : false;
 
         yield MapScreenLoaded(
-            officeInfo: officeInfo, slotInfo: slotInfo, canMark: canMark);
+            officeInfo: officeInfo,
+            slotInfo: slotInfo,
+            canMark: canMark,
+            slotNum: slot);
       } catch (e) {
         MapScreenError(
             message: 'Error in getting target office: ${e.toString()}');
