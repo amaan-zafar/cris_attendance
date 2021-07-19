@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cris_attendance/styles/colors.dart';
@@ -47,6 +48,14 @@ class _CameraScreenState extends State<CameraScreen> {
       setState(() {
         _pickImageError = e;
       });
+    }
+  }
+
+  void _completeAttendance() async {
+    if (_imageFile != null) {
+      List<int> imgBytes = await _imageFile!.readAsBytes();
+      String base64Img = base64Encode(imgBytes);
+      print('base64 is $base64Img');
     }
   }
 
@@ -188,7 +197,9 @@ class _CameraScreenState extends State<CameraScreen> {
               backgroundColor: AppColors.bgColorBeginGradient,
             )
           : FloatingActionButton.extended(
-              onPressed: () {},
+              onPressed: () {
+                _completeAttendance();
+              },
               label: Text('Complete Attendance'),
               icon: Icon(Feather.user_check),
               backgroundColor: AppColors.green,
