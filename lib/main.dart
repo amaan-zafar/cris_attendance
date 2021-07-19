@@ -1,5 +1,5 @@
+import 'package:cris_attendance/blocs/attendance_slot_bloc/post_attendance_bloc/post_attendance_bloc.dart';
 import 'package:cris_attendance/blocs/bloc_observer.dart';
-import 'package:cris_attendance/blocs/camera_bloc/camera_bloc.dart';
 import 'package:cris_attendance/blocs/emp_details_bloc/emp_details_bloc.dart';
 import 'package:cris_attendance/blocs/map_screen_bloc/map_screen_bloc.dart';
 import 'package:cris_attendance/network/api_base_helper.dart';
@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => EmpDetailsBloc(empDetailsRepo)),
         BlocProvider(create: (context) => MapScreenBloc()),
-        BlocProvider(create: (context) => CameraBloc()),
+        BlocProvider(create: (context) => PostAttendanceBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
