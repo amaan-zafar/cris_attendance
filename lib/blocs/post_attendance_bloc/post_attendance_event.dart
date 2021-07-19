@@ -6,3 +6,9 @@ abstract class PostAttendanceEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class PostAttendance extends PostAttendanceEvent {
+  PostAttendance();
+  @override
+  List<Object> get props => [];
+}
