@@ -23,16 +23,22 @@ class MapScreenBloc extends Bloc<MapScreenEvent, MapScreenState> {
       try {
         String slotInfo, officeInfo;
         bool canMark;
+
         AttendanceSlot? currentSlot = _getCurrentSlot();
+
         slotInfo = currentSlot != null
             ? '${currentSlot.startTime.hour}:${currentSlot.startTime.minute}-${currentSlot.endTime.hour}:${currentSlot.endTime.minute}'
             : 'Time Window Closed';
+
         final OfficeGeofence? targetOffice =
             await _getTargetOffice(globals.offices, event.currentPosition);
+
         officeInfo = targetOffice != null
             ? '${targetOffice.officeName} [${targetOffice.distanceFromCurrentLocation!.toStringAsFixed(2)}meters]'
             : 'Not with any CRIS office geofence';
+
         canMark = currentSlot != null || targetOffice != null ? true : false;
+
         yield MapScreenLoaded(
             officeInfo: officeInfo, slotInfo: slotInfo, canMark: canMark);
       } catch (e) {

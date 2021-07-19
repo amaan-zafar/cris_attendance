@@ -45,6 +45,7 @@ class EmployeeDetailsScreen extends StatelessWidget {
                           MaterialPageRoute(
                               builder: (_) => MapScreen(
                                     currentPosition: position,
+                                    empId: state.employee.empID,
                                   )));
                     } catch (e) {
                       print('Error in getting location: ${e.toString()}');

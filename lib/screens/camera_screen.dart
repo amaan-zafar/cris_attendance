@@ -15,8 +15,10 @@ import 'package:native_exif/native_exif.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CameraScreen extends StatefulWidget {
+  final int empId;
   final Position currentPosition;
-  const CameraScreen({required this.currentPosition, Key? key})
+  const CameraScreen(
+      {required this.currentPosition, required this.empId, Key? key})
       : super(key: key);
 
   @override

@@ -15,8 +15,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cris_attendance/globals/globals.dart' as globals;
 
 class MapScreen extends StatefulWidget {
+  final int empId;
   final Position currentPosition;
-  MapScreen({Key? key, required this.currentPosition}) : super(key: key);
+  MapScreen({Key? key, required this.currentPosition, required this.empId})
+      : super(key: key);
   @override
   _MapScreenState createState() => _MapScreenState();
 }
@@ -146,8 +148,9 @@ class _MapScreenState extends State<MapScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) =>
-                      CameraScreen(currentPosition: widget.currentPosition)));
+                  builder: (_) => CameraScreen(
+                      currentPosition: widget.currentPosition,
+                      empId: widget.empId)));
         },
         label: Text('Mark Attendance'),
         icon: Icon(Feather.user_check),
