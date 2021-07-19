@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cris_attendance/styles/colors.dart';
 import 'package:cris_attendance/widgets/card.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:native_exif/native_exif.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CameraScreen extends StatefulWidget {
   final Position currentPosition;
@@ -56,6 +58,13 @@ class _CameraScreenState extends State<CameraScreen> {
       List<int> imgBytes = await _imageFile!.readAsBytes();
       String base64Img = base64Encode(imgBytes);
       print('base64 is $base64Img');
+
+      // final path = await getApplicationDocumentsDirectory();
+      // Uint8List bytes = base64Decode(base64Img);
+      // var file = File('$path/counter.jpg');
+      // file.writeAsBytes(bytes);
+      // Exif exif = await Exif.fromPath(_imageFile!.path);
+      // print('exiffinal is ${await exif.getAttributes()}');
     }
   }
 
