@@ -54,7 +54,6 @@ class ReminderService {
 
   Future scheduledNotif(List<AttendanceSlot> slots) async {
     final DateTime now = DateTime.now();
-    print('Now time is $now');
     await _flutterLocalNotificationsPlugin.zonedSchedule(
         0,
         'Mark your Attendance',
@@ -98,7 +97,6 @@ class ReminderService {
     if (scheduledDateTime.weekday == DateTime.sunday) {
       scheduledDateTime = scheduledDateTime.add(const Duration(days: 1));
     }
-    print('scheduled date time is $scheduledDateTime');
     return scheduledDateTime;
   }
 }

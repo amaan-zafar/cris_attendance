@@ -145,7 +145,6 @@ class _MapScreenState extends State<MapScreen> {
     return fabIsVisible
         ? FloatingActionButton.extended(
             onPressed: () {
-              print('slottt is ${state.slotNum}');
               Navigator.push(
                   context,
                   MaterialPageRoute(

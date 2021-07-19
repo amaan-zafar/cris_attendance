@@ -67,13 +67,11 @@ class _CameraScreenState extends State<CameraScreen> {
     if (_imageFile != null) {
       List<int> imgBytes = await _imageFile!.readAsBytes();
       String base64Img = base64Encode(imgBytes);
-      print('base64 is $base64Img');
       DateTime now = DateTime.now();
       var dateFormatter = new DateFormat('yyyy-MM-dd');
       var timeFormatter = new DateFormat('HH:mm:ss');
       String formattedDate = dateFormatter.format(now);
       String formattedTime = timeFormatter.format(now);
-      print('Formatted time is : $formattedTime');
 
       bloc.add(PostAttendance(
           attendanceModel: PostAttendanceModel(
@@ -88,7 +86,6 @@ class _CameraScreenState extends State<CameraScreen> {
       // var file = File('$path/counter.jpg');
       // file.writeAsBytes(bytes);
       // Exif exif = await Exif.fromPath(_imageFile!.path);
-      // print('exiffinal is ${await exif.getAttributes()}');
     }
   }
 
